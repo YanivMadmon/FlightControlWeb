@@ -1,10 +1,81 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title></title>
-</head>
-<body>
+    <script src="js/MainJS.js"></script>
+    <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="https://npmcdn.com/bootstrap@4.0.0-alpha.5/dist/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+          crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+            crossorigin=""></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-</body>
+    <title>Flight app</title>
+
+    <meta name="description" content="Source code generated using layoutit.com">
+    <meta name="author" content="LayoutIt!">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+</head>
+  <body>
+
+  	<div class="container-fluid">
+  		<div class="row">
+            <div class="col-md-7">
+                <div id="mapid">
+                    <script>
+                        let mymap = L.map('mapid').setView([31.80, 35.20], 13);
+                        L.tileLayer('https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=INeUSkJ98XKYWli4tyyI', {
+                            attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+                        }).addTo(mymap);
+                    </script>
+                    
+                </div>
+                <h6>
+                    flight details
+                </h6>
+                <div>
+                    <textarea id="w3mission" rows="6" cols="92">
+                    </textarea>
+                </div>
+            </div>
+  			<div class="col-md-5">
+                <table id="flight_table" class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Flight ID
+                            </th>
+                            <th>
+                                Airline
+                            </th>
+                            <th>
+                                Is External
+                            </th>
+                            <th>
+                                AAA
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+  			</div>
+  		</div>
+  	</div>
+
+  	<script src="js/jquery.min.js"></script>
+  	<script src="js/bootstrap.min.js"></script>
+  	<script src="js/scripts.js"></script>
+ 	<script>
+        flightsTable();
+  	</script>
+  </body>
 </html>
