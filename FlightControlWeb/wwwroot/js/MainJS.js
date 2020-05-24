@@ -6,6 +6,7 @@ function getFlights() {
         data.forEach(function (flight) {
             $(flight).each(function (index, value) {
                 addFlights(value);
+                drawFlights(value);
             })
         })
         $('#flight_table tbody').empty();
