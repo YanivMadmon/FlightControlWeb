@@ -38,11 +38,22 @@ function addFlights(flight) {
 }
 
 function removeFlight(row) {
-
+    // delete flightplan from the server
+   /* function deleteFlightFromServer(id) {
+        let url = baseURL + "/api/Flights/" + id;
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            success: function (result) {
+                console.log(result);
+            }
+        });
+    }*/
 
     console.log(row);
     let a = row.parentNode.parentNode;
     let idFlighet = a.cells[0];
+    console.log(idFlighet);
     let url1 = "http://ronyut3.atwebpages.com/ap2/api/Flights/" + idFlighet;
     console.log(url1);
     $.ajax({
