@@ -15,6 +15,6 @@ function drawFlight(flight) {
 console.log(flight.longitude)
 var imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Airplane_silhouette.png',
 imageBounds = [[flight.longitude,flight.latitude], [flight.longitude-2,flight.latitude+3]];
-
+//guglihlihl
 L.imageOverlay(imageUrl, imageBounds).addTo(map);
 }
