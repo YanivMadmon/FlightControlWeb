@@ -1,12 +1,12 @@
 ﻿let thisFlight = "";
 function getFlights() {
     let current = getCurrentTime();
-    $.getJSON("http://ronyut2.atwebpages.com/ap2/api/Flights?relative_to=" + current, function (data) {
+    $.getJSON("http://ronyut3.atwebpages.com/ap2/api/Flights?relative_to=" + current, function (data) {
         //console.log(data);
         data.forEach(function (flight) {
             $(flight).each(function (index, value) {
                 addFlights(value);
-                drawFlights(value);
+                drawFlight(value);
             })
         })
         $('#flight_table tbody').empty();
@@ -43,7 +43,7 @@ function removeFlight(row) {
     console.log(row);
     let a = row.parentNode.parentNode;
     let idFlighet = a.cells[0];
-    let url1 = "http://ronyut2.atwebpages.com/ap2/api/Flights/" + idFlighet;
+    let url1 = "http://ronyut3.atwebpages.com/ap2/api/Flights/" + idFlighet;
     console.log(url1);
     $.ajax({
         url: url1,
