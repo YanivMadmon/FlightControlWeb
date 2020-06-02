@@ -1,4 +1,6 @@
 ﻿let map;
+let isClicked = false;
+flightDic = {}
 function drawMap() {
 	 let mymap = L.map('mapid').setView([31.80, 35.20], 13);
        L.tileLayer('https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=INeUSkJ98XKYWli4tyyI', {
@@ -6,15 +8,103 @@ function drawMap() {
         }).addTo(mymap);
         map=mymap;
 }
-
+class Flight {
+    constructor(flight) {
+        this.id = flight.flight_id;
+        this.longitude = flight.longitude;
+        this.latitude = flight.latitude;
+        this.is_external = flight.is_external;
+        this.passengers = flight.passengers;
+        this.data_time = flight.data_time;
+        this.company_name = flight.company_name;
+        this.icon;
+        this.isPressed = false;
+    }
+}
 
 function drawFlight(flight) {
-// add a marker in the given location
-L.marker([31.80, 35.20]).addTo(map);
-L.marker([flight.longitude, flight.latitude]).addTo(map);
+    let airplane = L.icon({
+        iconUrl: 'img/Plane_icon.svg',
+        iconSize: [40, 40], // size of the icon
+        iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
+        //popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
 
-var imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Sydney_Opera_House_-_Dec_2008.jpg/1024px-Sydney_Opera_House_-_Dec_2008.jpg',
-imageBounds = [center, [-35.8650, 154.2094]];
+   /* let RepAirplane = L.icon({
+        iconUrl: 'img/Thesquid.ink-Free-Flat-Sample-Space-rocket.svg',
+        iconSize: [40, 40], // size of the icon
+        iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
+        //popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });*/
 
-L.imageOverlay(imageUrl, imageBounds).addTo(map);
+    //this is not new flight
+    if (flight.flight_id in flightDic) {
+        flightDic[flight.flight_id].latitude = flight.latitude;
+        flightDic[flight.flight_id].longitude = flight.longitude;
+        let latlng = L.latLng(flight.latitude, flight.longitude);
+        flightDic[flight.flight_id].icon.setLatLng(latlng);
+    }
+    //this is new flight
+    else {
+        let f = new Flight(flight);
+        flightDic[flight.flight_id] = f;
+        flightDic[flight.flight_id].icon = L.marker([flight.longitude, flight.latitude],
+            { icon: airplane }).addTo(map)
+        flightDic[flight.flight_id].icon.addEventListener('click', () => {
+            clickFlight(flight.flight_id);
+        }, false);
+    }
+
+
+    /*if (flight.flight_id in flightDic) {
+        removeFromMap(flight.flight_id);
+    }
+    if (!(flightDic[flight.flight_id])) {
+        let marker = L.marker([flight.longitude, flight.latitude],
+            { icon: airplan }).addTo(map)
+        marker.addEventListener('click', () => {
+            airplanClick(marker);
+        }, false);
+    }
+    else {
+        let marker = L.marker([flight.longitude, flight.latitude],
+            { icon: RepAirplane }).addTo(map)
+    }
+    if (isClicked = true) {
+        console.log(marker);
+    }
+    flightDic[flight.flight_id] = marker;*/
+}
+
+
+function removeFromMap(id) {
+    map.removeLayer(flightDic[id].icon);
+}
+
+function airplanClick(id) {
+    //new Flight
+    let f=flightDic[id]
+    let airplane = L.icon({
+        iconUrl: 'img/Plane_icon.svg',
+        iconSize: [40, 40], // size of the icon
+        iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
+        //popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+
+    let RepAirplane = L.icon({
+        iconUrl: 'img/Thesquid.ink-Free-Flat-Sample-Space-rocket.svg',
+        iconSize: [40, 40], // size of the icon
+        iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
+    });
+    console.log(f);
+    f.icon.setIcon(RepAirplane);
+    let keys = Object.keys(flightDic);
+    for (let i = 0; i < keys.length; i++) {
+        if ((flightDic[keys[i]].isPressed = true) && (flightDic[keys[i]]!=f)) {
+            flightDic[keys[i]].isPressed = false;
+            console.log(flightDic[keys[i]].icon)
+            flightDic[keys[i]].icon.setIcon(airplane);
+        }
+    }
+    f.isPressed = true;
 }

@@ -1,25 +1,26 @@
 ﻿let thisFlight = "";
+let idCOl = -1;
 function getFlights() {
     let current = getCurrentTime();
-    $.getJSON("http://ronyut3.atwebpages.com/ap2/api/Flights?relative_to=" + current, function (data) {
+    $.getJSON("http://rony5.atwebpages.com/api/Flights?relative_to=" + current, function (data) {
         //console.log(data);
-        data.forEach(function (flight) {
-            $(flight).each(function (index, value) {
-                addFlights(value);
-                drawFlight(value);
-            })
-        })
-        $('#flight_table tbody').empty();
-        $('#flight_table tbody').append(thisFlight);
+        try {
+            IterateAllFlights(data);
+            $('#flight_table tbody').empty();
+            $('#flight_table tbody').append(thisFlight);
+        }
+        catch (e) {
+            console.log(e);
+        }
         thisFlight = "";
-        console.log(thisFlight);
+        //console.log(thisFlight);
     });
  }
 
 function flightsTable() {
     setInterval(function () {
         getFlights();
-    }, 4000);
+    }, 1000);
 }
 
 function getCurrentTime() {
@@ -32,30 +33,23 @@ function getCurrentTime() {
 
 function addFlights(flight) {
     let butt = "<button class=\"button button1\" onclick=\"removeFlight(this)\">x</button>"
-    thisFlight += "<tr><td>" + flight.flight_id +
+
+    thisFlight += "<tr id=\"" + flight.flight_id + "\"";
+    if (idCOl === flight.flight_id) {
+        thisFlight += "style=\"background-color: red;\" ";
+    }
+    thisFlight +=" "+"onclick =\"clickRow(this)\"><td>" + flight.flight_id +
         "</td>" + "<td>" + flight.company_name +
         "</td>" + "<td>" + flight.is_external + "</td>" + "<td>" + butt + "</td></tr>";
+    console.log(thisFlight);
 }
 
-function removeFlight(row) {
-    // delete flightplan from the server
-   /* function deleteFlightFromServer(id) {
-        let url = baseURL + "/api/Flights/" + id;
-        $.ajax({
-            url: url,
-            type: 'DELETE',
-            success: function (result) {
-                console.log(result);
-            }
-        });
-    }*/
 
-    console.log(row);
+
+function removeFlight(row) {
     let a = row.parentNode.parentNode;
-    let idFlighet = a.cells[0];
-    console.log(idFlighet);
-    let url1 = "http://ronyut3.atwebpages.com/ap2/api/Flights/" + idFlighet;
-    console.log(url1);
+    let idFlighet = a.cells[0].innerHTML;
+    let url1 = "http://rony5.atwebpages.com/api/Flights/" + idFlighet;
     $.ajax({
         url: url1,
         type: 'DELETE',
@@ -64,4 +58,34 @@ function removeFlight(row) {
         }
     });
     a.parentNode.removeChild(a);
+    removeFromMap(idFlighet);
+}
+
+function IterateAllFlights(data) {
+    data.forEach(function (flight) {
+        $(flight).each(function (index, value) {
+            addFlights(value);
+            drawFlight(value);
+        })
+    })
+}
+
+function clickRow(row) {
+    console.log(row);
+    let flightId = row.cells[0].innerHTML;
+    if (flightId in flightDic) {
+        clickFlight(flightId);
+        if (idCOl != -1) { //to found if any row is in color
+            let rowCol = document.getElementById(idCOl);
+            rowCol.style.backgroundColor = "white";
+        }
+        row.style.backgroundColor = "red";
+        idCOl = flightId;
+    }
+}
+
+function clickFlight(id) {
+    clickRow(id);
+    airplanClick(id);
+    //flightDetails(id);
 }
