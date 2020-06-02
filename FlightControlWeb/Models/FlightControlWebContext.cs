@@ -7,16 +7,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FlightControlWeb.Models
 {
-    public class FlightControlWebContext :DbContext
+    public class FlightControlWebContext : DbContext
     {
 
-            public FlightControlWebContext(DbContextOptions<FlightControlWebContext> options)
-                : base(options)
-            {
-            }
+        public FlightControlWebContext(DbContextOptions<FlightControlWebContext> options)
+            : base(options)
+        {
+        }
 
-            public DbSet<Flight> TodoItems { get; set; }
-        
-    } 
+        public DbSet<FlightPlan> flightPlans { get; set; }
+        public DbSet<Server> Servers { get; set; }
+        //public DbSet<Segment> segments  { get; set; }
+
+    }
+
+
 
 }

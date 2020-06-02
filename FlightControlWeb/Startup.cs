@@ -11,6 +11,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using FlightControlWeb.Models;
+using Microsoft.Extensions.Caching.Memory;
+using FlightControlWeb.Model;
+
 namespace FlightControlWeb
 {
     public class Startup
@@ -25,19 +28,25 @@ namespace FlightControlWeb
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<FlightControlWebContext>(opt =>
-              opt.UseInMemoryDatabase("FlightControlWeb"));
+            //services.AddDbContext<FlightControlWebContext>(opt =>
+            //  opt.UseInMemoryDatabase("FlightControlWeb"));
 
             services.AddControllers();
+            services.AddMemoryCache();
+            services.AddMvc();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IMemoryCache cache)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            cache.Set("FlightPlans", new Dictionary<string, FlightPlan>());
+            cache.Set("Servers", new Dictionary<string, Server>());
 
             app.UseStaticFiles();
 
