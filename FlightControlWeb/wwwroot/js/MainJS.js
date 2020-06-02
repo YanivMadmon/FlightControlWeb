@@ -1,11 +1,12 @@
 ﻿let thisFlight = "";
 function getFlights() {
     let current = getCurrentTime();
-    $.getJSON("http://ronyut2.atwebpages.com/ap2/api/Flights?relative_to=" + current, function (data) {
+    $.getJSON("http://ronyut3.atwebpages.com/ap2/api/Flights?relative_to=" + current, function (data) {
         //console.log(data);
         data.forEach(function (flight) {
             $(flight).each(function (index, value) {
                 addFlights(value);
+                drawFlight(value);
             })
         })
         $('#flight_table tbody').empty();
@@ -36,9 +37,24 @@ function addFlights(flight) {
         "</td>" + "<td>" + flight.is_external + "</td>" + "<td>" + butt + "</td></tr>";
 }
 
-function removeFlight(flight) {
-    console.log(flight);
-    let url1 = "http://ronyut2.atwebpages.com/ap2/api/Flights/" + flight.flight_id;
+function removeFlight(row) {
+    // delete flightplan from the server
+   /* function deleteFlightFromServer(id) {
+        let url = baseURL + "/api/Flights/" + id;
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            success: function (result) {
+                console.log(result);
+            }
+        });
+    }*/
+
+    console.log(row);
+    let a = row.parentNode.parentNode;
+    let idFlighet = a.cells[0];
+    console.log(idFlighet);
+    let url1 = "http://ronyut3.atwebpages.com/ap2/api/Flights/" + idFlighet;
     console.log(url1);
     $.ajax({
         url: url1,
@@ -47,4 +63,5 @@ function removeFlight(flight) {
             console.log("remove succes");
         }
     });
+    a.parentNode.removeChild(a);
 }
