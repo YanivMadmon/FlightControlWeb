@@ -46,6 +46,15 @@
             </div>
   			<div class="col-md-5">
                 <table id="flight_table" class="table">
+                <form id="myForm">
+			<!--label for="fileInput">Add a New Flight Plan</!--label-->
+			<input type="file" id="fileInput" onchange="onChange(event)" hidden="hidden" />
+			<button type="button" id="customButton" style="font-size:10px; height:auto; padding:10px; background-color:turquoise;
+				"> ADD A NEW FLIGHT
+			</button>
+			<!--span id="customText">No file chosen yet</!--span-->
+			<script src="js/contentFiles.js"></script>
+		</form>
                     <thead>
                         <tr>
                             <th>
