@@ -29,14 +29,6 @@ function drawFlight(flight) {
         iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
         //popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
-
-   /* let RepAirplane = L.icon({
-        iconUrl: 'img/Thesquid.ink-Free-Flat-Sample-Space-rocket.svg',
-        iconSize: [40, 40], // size of the icon
-        iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
-        //popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-    });*/
-
     //this is not new flight
     if (flight.flight_id in flightDic) {
         flightDic[flight.flight_id].latitude = flight.latitude;
@@ -54,31 +46,12 @@ function drawFlight(flight) {
             clickFlight(flight.flight_id);
         }, false);
     }
-
-
-    /*if (flight.flight_id in flightDic) {
-        removeFromMap(flight.flight_id);
-    }
-    if (!(flightDic[flight.flight_id])) {
-        let marker = L.marker([flight.longitude, flight.latitude],
-            { icon: airplan }).addTo(map)
-        marker.addEventListener('click', () => {
-            airplanClick(marker);
-        }, false);
-    }
-    else {
-        let marker = L.marker([flight.longitude, flight.latitude],
-            { icon: RepAirplane }).addTo(map)
-    }
-    if (isClicked = true) {
-        console.log(marker);
-    }
-    flightDic[flight.flight_id] = marker;*/
 }
 
 
 function removeFromMap(id) {
     map.removeLayer(flightDic[id].icon);
+    delete flightDic[id];
 }
 
 function airplanClick(id) {
@@ -96,13 +69,16 @@ function airplanClick(id) {
         iconSize: [40, 40], // size of the icon
         iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
     });
-    console.log(f);
+    //console.log(f);
+    let row=document.getElementById(id);
+    //console.log(row);
+    clickRow(row, false);
     f.icon.setIcon(RepAirplane);
     let keys = Object.keys(flightDic);
     for (let i = 0; i < keys.length; i++) {
         if ((flightDic[keys[i]].isPressed = true) && (flightDic[keys[i]]!=f)) {
             flightDic[keys[i]].isPressed = false;
-            console.log(flightDic[keys[i]].icon)
+            //console.log(flightDic[keys[i]].icon)
             flightDic[keys[i]].icon.setIcon(airplane);
         }
     }

@@ -1,8 +1,8 @@
 ﻿let thisFlight = "";
-let idCOl = -1;
-function getFlights() {
+let idCol = -1;
+/*function getFlights() {
     let current = getCurrentTime();
-    $.getJSON("http://rony5.atwebpages.com/api/Flights?relative_to=" + current, function (data) {
+    $.getJSON("http://rony10.atwebpages.com/api/Flights?relative_to=" + current, function (data) {
         //console.log(data);
         try {
             IterateAllFlights(data);
@@ -13,9 +13,26 @@ function getFlights() {
             console.log(e);
         }
         thisFlight = "";
-        //console.log(thisFlight);
     });
- }
+ }*/
+async function getFlights() {
+    try {
+        const currentTime = getCurrentTime();
+        let url = 'http://rony10.atwebpages.com' + '/api/Flights?relative_to=' + currentTime;
+        const response = await fetch(url);
+        // get the flights
+        let flightPlans = await response.json();
+        // iterate
+        IterateAllFlights(flightPlans);
+        // update table
+        $('#flight_table tbody').empty();
+        $('#flight_table tbody').append(thisFlight);
+        thisFlight = "";
+    }
+    catch (err) {
+        console.log('problem in GetFlights' + err);
+    }
+}
 
 function flightsTable() {
     setInterval(function () {
@@ -33,23 +50,32 @@ function getCurrentTime() {
 
 function addFlights(flight) {
     let butt = "<button class=\"button button1\" onclick=\"removeFlight(this)\">x</button>"
-
     thisFlight += "<tr id=\"" + flight.flight_id + "\"";
-    if (idCOl === flight.flight_id) {
-        thisFlight += "style=\"background-color: red;\" ";
+    if (idCol === flight.flight_id) {
+        thisFlight += "style=\"background-color: green;\" ";
     }
-    thisFlight +=" "+"onclick =\"clickRow(this)\"><td>" + flight.flight_id +
+    else {
+        thisFlight += "style=\"background-color: lightgray;\" ";
+    }
+    thisFlight +=" "+"onclick =\"clickRow(this,true)\"><td>" + flight.flight_id +
         "</td>" + "<td>" + flight.company_name +
         "</td>" + "<td>" + flight.is_external + "</td>" + "<td>" + butt + "</td></tr>";
-    console.log(thisFlight);
+    //console.log(thisFlight);
 }
 
 
 
 function removeFlight(row) {
+    //console.log(row);
     let a = row.parentNode.parentNode;
     let idFlighet = a.cells[0].innerHTML;
-    let url1 = "http://rony5.atwebpages.com/api/Flights/" + idFlighet;
+    //console.log(idFlighet + " = " + idCol);
+    if (idCol === idFlighet) {
+        idCol = -1;
+    }
+    //console.log("new" + idCol);
+    let url1 = "http://rony10.atwebpages.com/api/Flights/" + idFlighet;
+    //console.log(url1);
     $.ajax({
         url: url1,
         type: 'DELETE',
@@ -70,22 +96,36 @@ function IterateAllFlights(data) {
     })
 }
 
-function clickRow(row) {
-    console.log(row);
-    let flightId = row.cells[0].innerHTML;
-    if (flightId in flightDic) {
-        clickFlight(flightId);
-        if (idCOl != -1) { //to found if any row is in color
-            let rowCol = document.getElementById(idCOl);
-            rowCol.style.backgroundColor = "white";
+function clickRow(row, isFromRowClick) {
+    //console.log(row);
+    if (row != null) {
+        let flightId = row.cells[0].innerHTML;
+        if (flightId in flightDic) {
+            if (isFromRowClick) {
+                clickFlight(flightId);
+            }
+            if ((idCol != -1) && (idCol != flightId)) { //to found if any row is in color
+                let rowCol = document.getElementById(idCol);
+                if (rowCol != null) {
+                    rowCol.style.backgroundColor = "lightgray";
+                }
+            }
+            row.style.backgroundColor = "green";
+            idCol = flightId;
         }
-        row.style.backgroundColor = "red";
-        idCOl = flightId;
     }
 }
 
 function clickFlight(id) {
-    clickRow(id);
     airplanClick(id);
-    //flightDetails(id);
+    flightDetails(id);
+}
+
+function flightDetails(id) {
+    flightDetailsText = "";
+    $.getJSON("http://rony10.atwebpages.com/api/FlightPlan/" + id, function (data) {
+        console.log(data);
+        flightDetailsText=data
+    });
+    //document.getElementById("details").value = "Fifth Avenue, New York City";
 }
