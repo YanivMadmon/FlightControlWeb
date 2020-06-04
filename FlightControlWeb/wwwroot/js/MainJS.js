@@ -126,5 +126,5 @@ function flightDetails(id) {
     $.getJSON("http://rony10.atwebpages.com/api/FlightPlan/" + id, function (data) {
         console.log(data);
         flightDetailsText=data
-    });
+    });//
 }
