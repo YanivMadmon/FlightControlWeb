@@ -30,7 +30,7 @@ function onChange(event) {
 // Function that takes the new flight plan and posts it to the server
 function postflightplan(flightPlan) {
     (async () => {
-        const rawResponse = await fetch("http://rony10.atwebpages.com/api/Flights", {
+        const rawResponse = await fetch("http://rony9.atwebpages.com/api/FlightPlan", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

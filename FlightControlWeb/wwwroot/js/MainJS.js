@@ -1,24 +1,10 @@
 ﻿let thisFlight = "";
 let idCol = -1;
-/*function getFlights() {
-    let current = getCurrentTime();
-    $.getJSON("http://rony10.atwebpages.com/api/Flights?relative_to=" + current, function (data) {
-        //console.log(data);
-        try {
-            IterateAllFlights(data);
-            $('#flight_table tbody').empty();
-            $('#flight_table tbody').append(thisFlight);
-        }
-        catch (e) {
-            console.log(e);
-        }
-        thisFlight = "";
-    });
- }*/
+let detailsShow = -1;
 async function getFlights() {
     try {
         const currentTime = getCurrentTime();
-        let url = 'http://rony10.atwebpages.com' + '/api/Flights?relative_to=' + currentTime;
+        let url = 'http://rony9.atwebpages.com' + '/api/Flights?relative_to=' + currentTime;
         const response = await fetch(url);
         // get the flights
         let flightPlans = await response.json();
@@ -74,7 +60,7 @@ function removeFlight(row) {
         idCol = -1;
     }
     //console.log("new" + idCol);
-    let url1 = "http://rony10.atwebpages.com/api/Flights/" + idFlighet;
+    let url1 = "http://rony9.atwebpages.com/api/Flights/" + idFlighet;
     //console.log(url1);
     $.ajax({
         url: url1,
@@ -85,6 +71,9 @@ function removeFlight(row) {
     });
     a.parentNode.removeChild(a);
     removeFromMap(idFlighet);
+    if (detailsShow === idFlighet) {
+        cleanFlightDetails();
+    }
 }
 
 function IterateAllFlights(data) {
@@ -97,7 +86,7 @@ function IterateAllFlights(data) {
 }
 
 function clickRow(row, isFromRowClick) {
-    //console.log(row);
+    mapedClicked = false;
     if (row != null) {
         let flightId = row.cells[0].innerHTML;
         if (flightId in flightDic) {
@@ -122,9 +111,70 @@ function clickFlight(id) {
 }
 
 function flightDetails(id) {
-    flightDetailsText = "";
-    $.getJSON("http://rony10.atwebpages.com/api/FlightPlan/" + id, function (data) {
-        console.log(data);
-        flightDetailsText=data
-    });//
+    $.getJSON("http://rony9.atwebpages.com/api/FlightPlan/" + id, function (data) {
+        //console.log(data);
+        detailsShow = id;
+        //update passengers
+        const pas = document.getElementById("passengers");
+        pas.innerHTML = data["passengers"];
+
+        //update comanpany name
+        const comp = document.getElementById("company");
+        comp.innerHTML = data["company_name"];
+
+        //update initial location
+        const initLocation = data["initial_location"]
+        const initLat = document.getElementById("initialLat");
+        initLat.innerHTML ="lat: " + initLocation["latitude"];
+        const initLon = document.getElementById("initialLon");
+        initLon.innerHTML = "lon: " + initLocation["longitude"];
+
+        //update daparture
+        const initTime = document.getElementById("departure");
+        const dateFlight = new Date(initLocation["date_time"]);
+        initTime.innerHTML = dateFlight.toUTCString();
+
+        //update arrival time
+        const segments = data["segments"];
+        segments.unshift(initLocation);
+        drawPath(segments, data["initial_location"]["latitude"], data["initial_location"]["longitude"]);
+        let time = 0;
+        //sum all the time seconds
+        let i = 1;
+        for (i = 1; i < segments.length; i++) {
+            time += segments[i]["timespan_seconds"];
+        }
+        const arrive = document.getElementById("arrival");
+        const arrDate = dateFlight;
+        arrDate.setSeconds(dateFlight.getSeconds() + time);
+        arrive.innerHTML = arrDate.toUTCString();
+
+        //update final location
+        const finalLat = document.getElementById("finalLat");
+        finalLat.innerHTML = "lat: " + segments[i - 1]["latitude"];
+        const finalLoc = document.getElementById("finalLon");
+        finalLoc.innerHTML = "lon: " + segments[i - 1]["longitude"];
+
+    }).fail(function (data) {
+        errorHandle(data.status, "not find a flight plan");
+    });
+}
+
+function cleanFlightDetails() {
+    const comp = document.getElementById("company");
+    comp.innerHTML = "";
+    const pas = document.getElementById("passengers");
+    pas.innerHTML = "";
+    const initLat = document.getElementById("initialLat");
+    initLat.innerHTML = "";
+    const initLon = document.getElementById("initialLon");
+    initLon.innerHTML = "";
+    const finLon = document.getElementById("finalLon");
+    finLon.innerHTML = "";
+    const finLat = document.getElementById("finalLat");
+    finLat.innerHTML = "";
+    const dep = document.getElementById("departure");
+    dep.innerHTML = "";
+    const arr = document.getElementById("arrival");
+    arr.innerHTML = "";
 }

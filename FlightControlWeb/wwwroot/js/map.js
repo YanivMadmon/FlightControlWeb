@@ -1,12 +1,16 @@
 ﻿let map;
+//let polylinePoints=[]
 let isClicked = false;
+let mapedClicked = false;
+let polyline;
 flightDic = {}
 function drawMap() {
 	 let mymap = L.map('mapid').setView([31.80, 35.20], 13);
        L.tileLayer('https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=INeUSkJ98XKYWli4tyyI', {
         attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
         }).addTo(mymap);
-        map=mymap;
+    map = mymap;
+    map.on('click', onMapClick);
 }
 class Flight {
     constructor(flight) {
@@ -23,12 +27,6 @@ class Flight {
 }
 
 function drawFlight(flight) {
-    let airplane = L.icon({
-        iconUrl: 'img/Plane_icon.svg',
-        iconSize: [40, 40], // size of the icon
-        iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
-        //popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-    });
     //this is not new flight
     if (flight.flight_id in flightDic) {
         flightDic[flight.flight_id].latitude = flight.latitude;
@@ -38,6 +36,12 @@ function drawFlight(flight) {
     }
     //this is new flight
     else {
+        let airplane = L.icon({
+            iconUrl: 'img/Plane_icon.svg',
+            iconSize: [40, 40], // size of the icon
+            iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
+            //popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+        });
         let f = new Flight(flight);
         flightDic[flight.flight_id] = f;
         flightDic[flight.flight_id].icon = L.marker([flight.longitude, flight.latitude],
@@ -50,18 +54,21 @@ function drawFlight(flight) {
 
 
 function removeFromMap(id) {
+    //remove the airplane
     map.removeLayer(flightDic[id].icon);
+    //remove from the dictionary
     delete flightDic[id];
+    cleanPath();
 }
 
 function airplanClick(id) {
     //new Flight
+    mapedClicked = false;
     let f=flightDic[id]
     let airplane = L.icon({
         iconUrl: 'img/Plane_icon.svg',
         iconSize: [40, 40], // size of the icon
         iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
-        //popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
 
     let RepAirplane = L.icon({
@@ -69,18 +76,74 @@ function airplanClick(id) {
         iconSize: [40, 40], // size of the icon
         iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
     });
-    //console.log(f);
-    let row=document.getElementById(id);
-    //console.log(row);
+    let row = document.getElementById(id);
     clickRow(row, false);
     f.icon.setIcon(RepAirplane);
     let keys = Object.keys(flightDic);
     for (let i = 0; i < keys.length; i++) {
         if ((flightDic[keys[i]].isPressed = true) && (flightDic[keys[i]]!=f)) {
             flightDic[keys[i]].isPressed = false;
-            //console.log(flightDic[keys[i]].icon)
             flightDic[keys[i]].icon.setIcon(airplane);
         }
     }
     f.isPressed = true;
+}
+
+function drawPath(segments,lat,lon) {
+    //console.log(segments);
+    polylinePoints = [];
+    polylinePoints.push([lat, lon]);
+    let i = 0
+    for (i = 0; i < segments.length;i++) {
+        let x = segments[i].latitude;
+        let y = segments[i].longitude;
+        polylinePoints.push([x, y]);
+    }
+    polyline = L.polyline(polylinePoints).addTo(map);
+    //console.log(polyline);
+    /*polylinePoints.forEach(function (polylinePoints) {
+        new L.Marker(polylinePoints).addTo(map);
+    });*/
+}
+
+function cleanPath() {
+    //remove the segments markers
+   /* polylinePoints.forEach(function (polylinePoints) {
+        map.removeLayer(polylinePoints);
+    });*/
+    //remove the polyline
+    //console.log(polyline)
+    map.removeLayer(polyline);
+    polyline = undefined;
+    //nulify the array
+    //polylinePoints = [];
+}
+
+function onMapClick(e) {
+    if (mapedClicked === false) {
+        cleanPath();
+        cleanFlightDetails();
+        let keys = Object.keys(flightDic);
+
+        let airplane = L.icon({
+            iconUrl: 'img/Plane_icon.svg',
+            iconSize: [40, 40], // size of the icon
+            iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
+        });
+        for (let i = 0; i < keys.length; i++) {
+            if (flightDic[keys[i]].isPressed = true) {
+                flightDic[keys[i]].isPressed = false;
+                flightDic[keys[i]].icon.setIcon(airplane);
+            }
+
+            if (idCol != -1) { //to found if any row is in color
+                let rowCol = document.getElementById(idCol);
+                if (rowCol != null) {
+                    rowCol.style.backgroundColor = "lightgray";
+                }
+                idCol = -1;
+            }
+        }
+        mapedClicked = true
+    }
 }
