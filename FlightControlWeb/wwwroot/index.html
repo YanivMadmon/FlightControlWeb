@@ -47,10 +47,10 @@
                                     <div class="col-md-4">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <span class="badge badge-default" style="font-size: 150%">Flight company</span>
+                                                <span class="badge badge-default" style="font-size: 125%; background:darkorange;font-style: oblique">Company</span>
                                             </div>
                                             <div class="col-md-6">
-                                                <label id="company">try1
+                                                <label id="company" style="color: darkmagenta;font-style: oblique;font-size: 20px"><b>try1</b>
                                                 </label>
                                             </div>
                                         </div>
@@ -89,7 +89,7 @@
                                     <div class="col-md-4">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <span class="badge badge-default" style="font-size: 150%">Label8</span>
+                                                <span class="badge badge-default" style="font-size: 125%; background:darkorange;font-style: oblique">Label8</span>
                                             </div>
                                             <div class="col-md-6">
                                                 <label id="company">
@@ -133,17 +133,19 @@
                     </div>
                 </div>
             </div>
-  			<div class="col-md-5">
-                <table id="flight_table" class="table">
+            <div class="col-md-5">
                 <form id="myForm">
-			<!--label for="fileInput">Add a New Flight Plan</!--label-->
-			<input type="file" id="fileInput" onchange="onChange(event)" hidden="hidden" />
-			<button type="button" id="customButton" style="font-size:10px; height:auto; padding:10px; background-color:turquoise;
-				"> ADD A NEW FLIGHT
-			</button>
-			<!--span id="customText">No file chosen yet</!--span-->
-			<script src="js/contentFiles.js"></script>
-		</form>
+                    <!--label for="fileInput">Add a New Flight Plan</!--label-->
+                    <input type="file" id="fileInput" onchange="onChange(event)" hidden="hidden" />
+                    <button type="button" id="customButton" style="font-size:10px; height:auto; padding:10px; background-color:turquoise;
+				">
+                        <b>ADD A NEW FLIGHT</b>
+                    </button>
+                    <!--span id="customText">No file chosen yet</!--span-->
+                    <script src="js/contentFiles.js"></script>
+                </form>
+                <table id="flight_table" class="table">
+
                     <thead>
                         <tr>
                             <th>
@@ -156,14 +158,14 @@
                                 Is External
                             </th>
                             <th>
-                                
+
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                     </tbody>
                 </table>
-  			</div>
+            </div>
   		</div>
   	</div>
 

@@ -127,5 +127,4 @@ function flightDetails(id) {
         console.log(data);
         flightDetailsText=data
     });
-    //document.getElementById("details").value = "Fifth Avenue, New York City";
 }
