@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace FlightControlWeb.Models
@@ -40,17 +41,15 @@ namespace FlightControlWeb.Models
             string longitude, latitude, timespan_seconds;
             string longitu = "longitude: ", latitu = "latitude: ", timespan = "timespan_seconds: ";
             index = 0;
-            while (index < cut_input.IndexOf("]") - 3)
+            removeChars(cut_input);
+
+            while (index < cut_input.IndexOf("]"))
             {
                 index2 = cut_input.IndexOf("{", index);
                 index3 = cut_input.IndexOf("}", index);
-                char[] charsToTrim = { ' ', '\'','\n','\r' };
                 string cut_segment = cut_input.Substring(index2, index3 - index2 + 1);
-                cut_segment = cut_segment.Replace(" ", string.Empty);
-                cut_segment =cut_segment.Replace("\n", string.Empty);
-                cut_segment =cut_segment.Replace("\r", string.Empty);
 
-
+                removeChars(cut_segment);
 
                 i1 = cut_segment.IndexOf("longitude");
                 i2 = cut_segment.IndexOf("latitude");
@@ -75,6 +74,14 @@ namespace FlightControlWeb.Models
                 fp.segments.Add(s);
                 index = index3 + 1;
             }
+
+        }
+        public void removeChars(string str)
+        {
+            str = str.Replace(" ", string.Empty);
+            str = str.Replace("\n", string.Empty);
+            str = str.Replace("\r", string.Empty);
+
         }
     }
 }
