@@ -13,6 +13,6 @@ namespace FlightControlWeb.Model
         public int passengers { get; set; }
         public string company_name { get; set; }
         public DateTime data_time { get; set; }
-        public bool is_extetanl { get; set; }
+        public bool is_external { get; set; }
     }
 }

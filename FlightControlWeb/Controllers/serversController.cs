@@ -20,7 +20,6 @@ namespace FlightControlWeb.Controllers
     {
 
         private readonly IMemoryCache cache;
-       // private readonly FlightControlWebContext DB;
         private Dictionary<string, Server> serverList;
 
 
@@ -28,7 +27,6 @@ namespace FlightControlWeb.Controllers
         {
             this.cache = memoryCache;
             serverList = cache.Get("Servers") as Dictionary<string, Server>;
-            // this.DB = db;
 
         }
 
@@ -56,8 +54,7 @@ namespace FlightControlWeb.Controllers
                 return NotFound();
             }
             serverList.Add(newServer.Id, newServer);    
-            //await DB.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetServer), new { id = newServer.Id }, newServer);
+            return Ok(newServer);
         }
 
         [HttpDelete("{id}")]
@@ -68,7 +65,6 @@ namespace FlightControlWeb.Controllers
                 return NotFound();
             }
             serverList.Remove(id);
-            //await DB.SaveChangesAsync();
 
             return NoContent();
         }

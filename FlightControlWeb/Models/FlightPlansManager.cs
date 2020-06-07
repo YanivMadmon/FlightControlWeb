@@ -65,8 +65,6 @@ namespace FlightControlWeb.Models
                     latitude = Convert.ToDouble(latitude),
                     timespan_seconds = Convert.ToInt32(timespan_seconds)
                 };
-                //s.Id = fp.Id + fp.segments.Count;
-                //DB.segments.AddAsync(s);
                 fp.segments.Add(s);
                 index = index3 + 1;
             }

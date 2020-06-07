@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FlightControlWeb.Model;
 using FlightControlWeb.Models;
@@ -14,7 +15,6 @@ namespace FlightControlWeb.Controllers
     public class FlightsController : ControllerBase
     {
         private readonly IMemoryCache cache;
-        //private readonly FlightControlWebContext DB;
         private Dictionary<string, FlightPlan> fpList;
         private Dictionary<string, Server> serverList;
         private FlightsManager manager;
@@ -25,14 +25,9 @@ namespace FlightControlWeb.Controllers
         public FlightsController(IMemoryCache memoryCache)
         {
             this.cache = memoryCache;
-            //this.DB =db ;
-            this.manager = new FlightsManager();
+            this.manager = new FlightsManager(memoryCache);
             fpList = (Dictionary<string, FlightPlan>)cache.Get("FlightPlans");
             serverList = (Dictionary<string, Server>)cache.Get("Servers");
-
-
-
-
         }
 
         [HttpGet]
@@ -45,23 +40,16 @@ namespace FlightControlWeb.Controllers
             }
             relativeTime = relativeTime.ToUniversalTime();
             List<Flight> flightsList = new List<Flight>();
-            if (Request.Query.ContainsKey("sync_all"))
+
+            if (Request.Query.ContainsKey("sync_all")&&(serverList.Count != 0))
             {
-                if (serverList.Count != 0)
-                {
                     List<Flight> flightsListServer;
-
-                    foreach (Server s in serverList.Values)
+                    flightsListServer = (List<Flight>)await manager.serverFlights(relativeTime);
+                    if (flightsListServer != null)
                     {
-                        flightsListServer = (List<Flight>)await manager.serverFlights(s, relativeTime);
-                        if (flightsListServer != null)
-                        {
-                            flightsList.AddRange(flightsListServer);
+                        flightsList.AddRange(flightsListServer);
 
-                        }
                     }
-
-                }
             }
             foreach (FlightPlan f in fpList.Values)
             {
@@ -70,16 +58,6 @@ namespace FlightControlWeb.Controllers
             return flightsList;
 
         }
-
-        //public  Task<IEnumerable<Flight>> GetFlight([FromQuery(Name = "relative_to")] string relative_to)
-        //{
-        //    DateTime relativeTime;
-        //    if (!DateTime.TryParse(relative_to, out relativeTime))
-        //    {
-        //        return null;
-        //    }
-        //    relativeTime = relativeTime.ToUniversalTime();
-        //}
     }
 
     

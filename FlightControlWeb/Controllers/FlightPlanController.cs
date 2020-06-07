@@ -14,7 +14,6 @@ namespace FlightControlWeb.Controllers
     public class FlightPlanController : ControllerBase
     {
         private FlightPlansManager manger;
-        //private  FlightControlWebContext DB;
         private readonly IMemoryCache cache;
         private Dictionary<string, FlightPlan> fplist;
 
@@ -22,7 +21,6 @@ namespace FlightControlWeb.Controllers
         public FlightPlanController(IMemoryCache memoryCache )
         {
             cache = memoryCache;
-            //this.DB = db;
             this.manger = new FlightPlansManager();
             fplist = cache.Get("FlightPlans") as Dictionary<string, FlightPlan>;
 
@@ -32,17 +30,12 @@ namespace FlightControlWeb.Controllers
         public ActionResult<FlightPlan> GetPlan(string id)
         {
 
-            //var fp = await DB.flightPlans.Where(x => x.Id == id).FirstOrDefaultAsync();
-            //if (fp == null)
-            //{
-            //    return NotFound();
-            //}
-            if (!(fplist.ContainsKey(id)))
+            if (!fplist.ContainsKey(id))
             {
                 return NotFound();
             }
             FlightPlan fp = fplist[id];
-            return CreatedAtAction(nameof(GetPlan), new { id = fp.Id }, fp); 
+            return Ok(fp); 
         }
 
         [HttpPost]
@@ -67,9 +60,7 @@ namespace FlightControlWeb.Controllers
                 return NotFound();
             }
             fplist.Add(newPlan.Id,newPlan);
-            //DB.flightPlans.Add(newPlan);
-           // await DB.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetPlan), new { id = newPlan.Id }, newPlan);
+            return Ok(newPlan);
         }
 
     }
