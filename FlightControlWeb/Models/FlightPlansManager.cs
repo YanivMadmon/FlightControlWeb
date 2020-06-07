@@ -44,21 +44,28 @@ namespace FlightControlWeb.Models
             {
                 index2 = cut_input.IndexOf("{", index);
                 index3 = cut_input.IndexOf("}", index);
+                char[] charsToTrim = { ' ', '\'','\n','\r' };
                 string cut_segment = cut_input.Substring(index2, index3 - index2 + 1);
+                cut_segment = cut_segment.Replace(" ", string.Empty);
+                cut_segment =cut_segment.Replace("\n", string.Empty);
+                cut_segment =cut_segment.Replace("\r", string.Empty);
+
+
+
                 i1 = cut_segment.IndexOf("longitude");
                 i2 = cut_segment.IndexOf("latitude");
                 i3 = cut_segment.IndexOf("timespan_seconds");
                 if (i1 == -1 || i2 == -1 || i3 == -1)
                 {
                 }
-                i1 += longitu.Length + 1;
-                i2 += latitu.Length + 1;
-                i3 += timespan.Length + 1;
+                i1 += longitu.Length;
+                i2 += latitu.Length;
+                i3 += timespan.Length;
                 first = cut_segment.IndexOf(",");
                 second = cut_segment.IndexOf(",", first + 1);
                 longitude = cut_segment.Substring(i1, first - i1);
                 latitude = cut_segment.Substring(i2, second - i2);
-                timespan_seconds = cut_segment.Substring(i3, cut_segment.IndexOf("}") - i3 - 2);
+                timespan_seconds = cut_segment.Substring(i3, cut_segment.IndexOf("}") - i3);
                 Segment s = new Segment
                 {
                     longitude = Convert.ToDouble(longitude),
@@ -69,7 +76,5 @@ namespace FlightControlWeb.Models
                 index = index3 + 1;
             }
         }
-
-
     }
 }
