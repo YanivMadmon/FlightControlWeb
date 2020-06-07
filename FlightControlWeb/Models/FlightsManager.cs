@@ -1,5 +1,4 @@
 ﻿using FlightControlWeb.Model;
-using Microsoft.AppCenter.Crashes;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;

@@ -4,7 +4,7 @@ let detailsShow = -1;
 async function getFlights() {
     try {
         const currentTime = getCurrentTime();
-        let url = 'http://rony9.atwebpages.com' + '/api/Flights?relative_to=' + currentTime;
+        let url = 'http://localhost:5000' + '/api/Flights?relative_to=' + currentTime;
         const response = await fetch(url);
         // get the flights
         let flightPlans = await response.json();
@@ -60,7 +60,7 @@ function removeFlight(row) {
         idCol = -1;
     }
     //console.log("new" + idCol);
-    let url1 = "http://rony9.atwebpages.com/api/Flights/" + idFlighet;
+    let url1 = "http://localhost:5000/api/Flights/" + idFlighet;
     //console.log(url1);
     $.ajax({
         url: url1,
@@ -111,7 +111,7 @@ function clickFlight(id) {
 }
 
 function flightDetails(id) {
-    $.getJSON("http://rony9.atwebpages.com/api/FlightPlan/" + id, function (data) {
+    $.getJSON("http://localhost:5000/api/FlightPlan/" + id, function (data) {
         //console.log(data);
         detailsShow = id;
         //update passengers
