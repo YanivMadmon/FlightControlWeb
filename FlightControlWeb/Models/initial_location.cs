@@ -7,8 +7,9 @@ namespace FlightControlWeb.Models
 {
     public class initial_location
     {
-        public double longitude { get; set; }
         public double latitude { get; set; }
+
+        public double longitude { get; set; }
         public DateTime date_time;
         //public string data_time
         //{

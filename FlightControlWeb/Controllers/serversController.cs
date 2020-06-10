@@ -51,7 +51,7 @@ namespace FlightControlWeb.Controllers
             };
 
             if (serverList.ContainsKey(newServer.Id)) {
-                return NotFound();
+                return BadRequest("server exist");
             }
             serverList.Add(newServer.Id, newServer);    
             return Ok(newServer);

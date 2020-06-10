@@ -57,7 +57,7 @@ namespace FlightControlWeb.Models
             {
                 if (initTime.AddSeconds(seg.timespan_seconds) >= relativeTime)
                 {
-                    // calcultet the place
+                    // calculate the place
                     disTime = (initTime - relativeTime).TotalSeconds;
                     latForSec = (seg.latitude - latInit) / seg.timespan_seconds;
                     lonForSec = (seg.longitude - lonInit) / seg.timespan_seconds;
