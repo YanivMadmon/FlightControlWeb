@@ -1,5 +1,6 @@
 ﻿using FlightControlWeb.Model;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace FlightControlWeb.Models
 {
-    public class FlightPlansManager
+    public class FlightPlansManager : IFlightPlansManager
     {
 
         public void idCreate(FlightPlan fp)
         {
-            string time = fp.data_time.ToString("yyyy-MM-ddTHH:mm:ss.fff");
+            //string time = fp.initial_location.data_time;
             string time1 = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff");
             string company = fp.company_name;
             string newId = "";
@@ -41,7 +42,7 @@ namespace FlightControlWeb.Models
             string longitude, latitude, timespan_seconds;
             string longitu = "longitude: ", latitu = "latitude: ", timespan = "timespan_seconds: ";
             index = 0;
-            removeChars(cut_input);
+            cut_input = removeChars(cut_input);
 
             while (index < cut_input.IndexOf("]"))
             {
@@ -49,7 +50,7 @@ namespace FlightControlWeb.Models
                 index3 = cut_input.IndexOf("}", index);
                 string cut_segment = cut_input.Substring(index2, index3 - index2 + 1);
 
-                removeChars(cut_segment);
+                cut_segment = removeChars(cut_segment);
 
                 i1 = cut_segment.IndexOf("longitude");
                 i2 = cut_segment.IndexOf("latitude");
@@ -76,12 +77,41 @@ namespace FlightControlWeb.Models
             }
 
         }
-        public void removeChars(string str)
+        public String removeChars(string str)
         {
             str = str.Replace(" ", string.Empty);
             str = str.Replace("\n", string.Empty);
             str = str.Replace("\r", string.Empty);
+            return str;
 
+        }
+        public FlightPlan createFP(string input)
+        {
+            dynamic obj = JsonConvert.DeserializeObject(input);
+            FlightPlan newPlan = null;
+            try
+            {
+                newPlan = new FlightPlan
+                {
+                    company_name = obj["company_name"],
+                    passengers = obj["passengers"],
+                    initial_location = new initial_location
+                    {
+                        longitude = obj["initial_location"]["longitude"],
+                        latitude = obj["initial_location"]["latitude"],
+                        date_time = obj["initial_location"]["date_time"]
+                    },
+                    segments = new List<Segment>()
+
+                };
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            idCreate(newPlan);
+            createSegments(newPlan, input);
+            return newPlan;
         }
     }
 }

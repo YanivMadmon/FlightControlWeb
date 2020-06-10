@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FlightControlWeb.Model;
 using FlightControlWeb.Models;
@@ -17,15 +16,15 @@ namespace FlightControlWeb.Controllers
         private readonly IMemoryCache cache;
         private Dictionary<string, FlightPlan> fpList;
         private Dictionary<string, Server> serverList;
-        private FlightsManager manager;
+        private IFlightsManager manager;
 
 
 
 
-        public FlightsController(IMemoryCache memoryCache)
+        public FlightsController(IMemoryCache memoryCache , IFlightsManager manager)
         {
             this.cache = memoryCache;
-            this.manager = new FlightsManager(memoryCache);
+            this.manager = manager;
             fpList = (Dictionary<string, FlightPlan>)cache.Get("FlightPlans");
             serverList = (Dictionary<string, Server>)cache.Get("Servers");
         }
@@ -40,16 +39,15 @@ namespace FlightControlWeb.Controllers
             }
             relativeTime = relativeTime.ToUniversalTime();
             List<Flight> flightsList = new List<Flight>();
-
-            if (Request.Query.ContainsKey("sync_all")&&(serverList.Count != 0))
+            if (Request.Query.ContainsKey("sync_all") && (serverList.Count != 0))
             {
-                    List<Flight> flightsListServer;
-                    flightsListServer = (List<Flight>)await manager.serverFlights(relativeTime);
-                    if (flightsListServer != null)
-                    {
-                        flightsList.AddRange(flightsListServer);
+                List<Flight> flightsListServer;
+                flightsListServer = await manager.serverFlights(relativeTime);
+                if (flightsListServer != null)
+                {
+                    flightsList.AddRange(flightsListServer);
 
-                    }
+                }
             }
             foreach (FlightPlan f in fpList.Values)
             {
@@ -58,7 +56,19 @@ namespace FlightControlWeb.Controllers
             return flightsList;
 
         }
+        [HttpDelete("{id}")]
+        public ActionResult<Flight> DeleteServer(string id)
+        {
+            if (!fpList.ContainsKey(id))
+            {
+                return NotFound();
+            }
+            fpList.Remove(id);
+
+            return NoContent();
+        }
+
     }
 
-    
+
 }

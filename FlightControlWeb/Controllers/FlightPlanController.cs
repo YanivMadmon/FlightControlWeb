@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using FlightControlWeb.Model;
 using FlightControlWeb.Models;
+using Microsoft.AppCenter.Crashes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace FlightControlWeb.Controllers
 {
@@ -13,15 +16,15 @@ namespace FlightControlWeb.Controllers
     [ApiController]
     public class FlightPlanController : ControllerBase
     {
-        private FlightPlansManager manger;
+        private IFlightPlansManager manger;
         private readonly IMemoryCache cache;
         private Dictionary<string, FlightPlan> fplist;
 
 
-        public FlightPlanController(IMemoryCache memoryCache )
+        public FlightPlanController(IMemoryCache memoryCache , IFlightPlansManager manager )
         {
             cache = memoryCache;
-            this.manger = new FlightPlansManager();
+            this.manger = manager;
             fplist = cache.Get("FlightPlans") as Dictionary<string, FlightPlan>;
 
         }
@@ -29,7 +32,6 @@ namespace FlightControlWeb.Controllers
         [HttpGet("{id}")]
         public ActionResult<FlightPlan> GetPlan(string id)
         {
-
             if (!fplist.ContainsKey(id))
             {
                 return NotFound();
@@ -39,27 +41,18 @@ namespace FlightControlWeb.Controllers
         }
 
         [HttpPost]
-        public ActionResult<FlightPlan> PostPlan([FromBody] JsonElement body)
+        public IActionResult PostPlan(object body)
         {
             string input = body.ToString();
+           
+            FlightPlan newPlan = manger.createFP(input);
 
-            dynamic obj = JsonConvert.DeserializeObject(input);
-
-            var newPlan = new FlightPlan {
-                company_name = obj["company_name"],
-                passengers = obj["passengers"],
-                longitude = obj["initial_location"]["longitude"],
-                latitude = obj["initial_location"]["latitude"],
-                data_time = obj["initial_location"]["date_time"],
-                segments = new List<Segment>()
-            };
-            manger.idCreate(newPlan);
-            manger.createSegments(newPlan , input);
-            if (fplist.ContainsKey(newPlan.Id))
+            if (newPlan == null||fplist.ContainsKey(newPlan.Id))
             {
-                return NotFound();
+                return BadRequest("worng input");
             }
             fplist.Add(newPlan.Id,newPlan);
+
             return Ok(newPlan);
         }
 

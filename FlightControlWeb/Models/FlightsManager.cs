@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FlightControlWeb.Models
 {
-    public class FlightsManager
+    public class FlightsManager : IFlightsManager
     {
         private Dictionary<string, Server> serverList;
 
@@ -24,30 +24,33 @@ namespace FlightControlWeb.Models
             {
                 allTime += seg.timespan_seconds;
             }
-            DateTime finalTime = fp.data_time.AddSeconds(allTime);
-            if (!((fp.data_time <= relativeTime) && (relativeTime <= finalTime)))
+
+            DateTime finalTime = fp.initial_location.date_time.AddSeconds(allTime);
+            DateTime initTime = fp.initial_location.date_time;
+            if (!((initTime <= relativeTime) && (relativeTime <= finalTime)))
             {
                 return;
             }
             else
             {
+
                 findPlace(fp, flightsList, relativeTime);
             }
         }
         public void findPlace(FlightPlan fp, List<Flight> flightsList, DateTime relativeTime)
         {
-            DateTime initTime = fp.data_time;
+            DateTime initTime = fp.initial_location.date_time;
             Flight newFlight = new Flight
             {
                 flight_id = fp.Id,
                 company_name = fp.company_name,
                 passengers = fp.passengers,
-                data_time = relativeTime,
+                date_time = relativeTime,
                 is_external = false
             };
 
-            double latInit = fp.latitude;
-            double lonInit = fp.longitude;
+            double latInit = fp.initial_location.latitude;
+            double lonInit = fp.initial_location.longitude;
             double disTime, latForSec, lonForSec, latDate = 0, lonDate = 0;
 
             foreach (Segment seg in fp.segments)
@@ -75,7 +78,7 @@ namespace FlightControlWeb.Models
 
             flightsList.Add(newFlight);
         }
-        public async Task<IEnumerable<Flight>> serverFlights( DateTime relativeTime)
+        public async Task<List<Flight>> serverFlights( DateTime relativeTime)
         {
             List<Flight> allFlights = new List<Flight>() ;
             List<Flight> flightsListServer;
