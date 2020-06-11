@@ -2,7 +2,7 @@
 //let polylinePoints=[]
 let isClicked = false;
 let mapedClicked = false;
-let polyline;
+let polyline = undefined;
 flightDic = {}
 function drawMap() {
 	 let mymap = L.map('mapid').setView([31.80, 35.20], 13);
@@ -37,7 +37,7 @@ function drawFlight(flight) {
     //this is new flight
     else {
         let airplane = L.icon({
-            iconUrl: 'img/Plane_icon.svg',
+            iconUrl: 'img/Black-airplane-flight.svg',
             iconSize: [40, 40], // size of the icon
             iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
             //popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
@@ -62,17 +62,18 @@ function removeFromMap(id) {
 }
 
 function airplanClick(id) {
+    cleanPath();
     //new Flight
     mapedClicked = false;
     let f=flightDic[id]
     let airplane = L.icon({
-        iconUrl: 'img/Plane_icon.svg',
+        iconUrl: 'img/Black-airplane-flight.svg',
         iconSize: [40, 40], // size of the icon
         iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
     });
 
     let RepAirplane = L.icon({
-        iconUrl: 'img/Thesquid.ink-Free-Flat-Sample-Space-rocket.svg',
+        iconUrl: 'img/blue-airplane-flight.svg',
         iconSize: [40, 40], // size of the icon
         iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
     });
@@ -87,6 +88,7 @@ function airplanClick(id) {
         }
     }
     f.isPressed = true;
+
 }
 
 function drawPath(segments,lat,lon) {
@@ -107,16 +109,10 @@ function drawPath(segments,lat,lon) {
 }
 
 function cleanPath() {
-    //remove the segments markers
-   /* polylinePoints.forEach(function (polylinePoints) {
-        map.removeLayer(polylinePoints);
-    });*/
-    //remove the polyline
-    //console.log(polyline)
-    map.removeLayer(polyline);
-    polyline = undefined;
-    //nulify the array
-    //polylinePoints = [];
+    if (polyline != undefined) {
+        map.removeLayer(polyline);
+        polyline = undefined;
+    }
 }
 
 function onMapClick(e) {
@@ -126,7 +122,7 @@ function onMapClick(e) {
         let keys = Object.keys(flightDic);
 
         let airplane = L.icon({
-            iconUrl: 'img/Plane_icon.svg',
+            iconUrl: 'img/Black-airplane-flight.svg',
             iconSize: [40, 40], // size of the icon
             iconAnchor: [20, 20], // point of the icon which will correspond to marker's location
         });
