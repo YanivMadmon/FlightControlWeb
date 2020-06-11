@@ -43,12 +43,19 @@ namespace FlightControlWeb.Controllers
             string input = body.ToString();
 
             dynamic obj = JsonConvert.DeserializeObject(input);
-
-            var newServer = new Server
+            Server newServer;
+            try
             {
-                Id = obj["ServerId"],
-                ServerURL = obj["ServerURL"],
-            };
+                newServer = new Server
+                {
+                    Id = obj["ServerId"],
+                    ServerURL = obj["ServerURL"],
+                };
+            }
+            catch (Exception e)
+            {
+                return BadRequest("worng input"); ;
+            }
 
             if (serverList.ContainsKey(newServer.Id)) {
                 return BadRequest("server exist");

@@ -58,11 +58,26 @@ namespace FlightControlWeb.Models
                 if (initTime.AddSeconds(seg.timespan_seconds) >= relativeTime)
                 {
                     // calculate the place
-                    disTime = (initTime - relativeTime).TotalSeconds;
-                    latForSec = (seg.latitude - latInit) / seg.timespan_seconds;
-                    lonForSec = (seg.longitude - lonInit) / seg.timespan_seconds;
-                    latDate = latInit + (disTime * latForSec);
-                    lonDate = lonInit + (disTime * lonForSec);
+                    disTime = (relativeTime-initTime).TotalSeconds;
+                    latForSec = Math.Abs(seg.latitude - latInit) / seg.timespan_seconds;
+                    lonForSec = Math.Abs(seg.longitude - lonInit) / seg.timespan_seconds;
+                    if (latInit >=seg.latitude)
+                    {
+                        latDate = latInit - (disTime * latForSec);
+                    }
+                    else
+                    {
+                        latDate = latInit + (disTime * latForSec);
+                    }
+                    if (lonInit >= seg.longitude)
+                    {
+                        lonDate = lonInit - (disTime * lonForSec);
+
+                    }
+                    else
+                    {
+                        lonDate = lonInit + (disTime * lonForSec);
+                    }
                     break;
                 }
                 else
@@ -70,7 +85,7 @@ namespace FlightControlWeb.Models
                     // go to the end of the segment
                     latInit = seg.latitude;
                     lonInit = seg.longitude;
-                    initTime.AddSeconds(seg.timespan_seconds);
+                    initTime = initTime.AddSeconds(seg.timespan_seconds);
                 }
             }
             newFlight.latitude = latDate;
@@ -109,6 +124,7 @@ namespace FlightControlWeb.Models
             }
             catch (Exception e)
             {
+
                 return null;
             }
             Stream dataStream = response.GetResponseStream();
