@@ -34,7 +34,7 @@ namespace FlightControlTests
             JObject jsonElement = JObject.Parse(Json);
             return fakePlan;
     }
-        public async Task<List<Flight>> fakeFlight()
+        public  List<Flight> fakeFlight()
         {
             Random random = new Random();
             List<Flight> fList = new List<Flight>();

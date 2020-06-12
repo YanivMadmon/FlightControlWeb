@@ -4,7 +4,7 @@ let detailsShow = -1;
 async function getFlights() {
     try {
         const currentTime = getCurrentTime();
-        let url = 'http://localhost:5000' + '/api/Flights?relative_to=' + currentTime;
+        let url = 'http://localhost:5000' + '/api/Flights?relative_to=' + currentTime + "&sync_all";
         const response = await fetch(url);
         // get the flights
         let flightPlans = await response.json();

@@ -100,7 +100,7 @@ namespace FlightControlWeb.Models
 
             foreach (Server s in serverList.Values)
             {
-                flightsListServer = (List<Flight>)await serverGet(s, relativeTime);
+                flightsListServer = await serverGet(s, relativeTime);
                 if (flightsListServer != null)
                 {
                     allFlights.AddRange(flightsListServer);
@@ -108,9 +108,9 @@ namespace FlightControlWeb.Models
             }
             return allFlights;
         }
-        public async Task<IEnumerable<Flight>> serverGet(Server server, DateTime relativeTime)
+        public async Task<List<Flight>> serverGet(Server server, DateTime relativeTime)
         {
-            HttpWebResponse response = null;
+            HttpWebResponse response;
 
             try
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading.Tasks;
 using FlightControlWeb.Model;
 using FlightControlWeb.Models;
 using Microsoft.AppCenter.Crashes;
@@ -16,7 +17,7 @@ namespace FlightControlWeb.Controllers
     [ApiController]
     public class FlightPlanController : ControllerBase
     {
-        private IFlightPlansManager manger;
+        private IFlightPlansManager manager;
         private readonly IMemoryCache cache;
         private Dictionary<string, FlightPlan> fplist;
 
@@ -24,19 +25,27 @@ namespace FlightControlWeb.Controllers
         public FlightPlanController(IMemoryCache memoryCache , IFlightPlansManager manager )
         {
             cache = memoryCache;
-            this.manger = manager;
+            this.manager = manager;
             fplist = cache.Get("FlightPlans") as Dictionary<string, FlightPlan>;
 
         }
 
         [HttpGet("{id}")]
-        public ActionResult<FlightPlan> GetPlan(string id)
+        public async Task<ObjectResult> GetPlan(string id)
         {
+            FlightPlan fp;
             if (!fplist.ContainsKey(id))
             {
-                return NotFound();
+                fp = await manager.serverFlightPlan(id);
+                if (fp == null)
+                {
+                    return null;
+                }
             }
-            FlightPlan fp = fplist[id];
+            else
+            {
+                fp = fplist[id];
+            }
             return Ok(fp); 
         }
 
@@ -45,7 +54,7 @@ namespace FlightControlWeb.Controllers
         {
             string input = body.ToString();
            
-            FlightPlan newPlan = manger.createFP(input);
+            FlightPlan newPlan = manager.createFP(input);
 
             if (newPlan == null||fplist.ContainsKey(newPlan.Id))
             {

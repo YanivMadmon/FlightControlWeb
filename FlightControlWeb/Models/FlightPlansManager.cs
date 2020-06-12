@@ -1,9 +1,12 @@
 ﻿using FlightControlWeb.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -11,6 +14,11 @@ namespace FlightControlWeb.Models
 {
     public class FlightPlansManager : IFlightPlansManager
     {
+        private Dictionary<string, Server> serverList;
+        public FlightPlansManager(IMemoryCache memoryCache)
+        {
+            serverList = (Dictionary<string, Server>)memoryCache.Get("Servers");
+        }
 
         public void idCreate(FlightPlan fp)
         {
@@ -88,7 +96,7 @@ namespace FlightControlWeb.Models
         public FlightPlan createFP(string input)
         {
             dynamic obj = JsonConvert.DeserializeObject(input);
-            FlightPlan newPlan = null;
+            FlightPlan newPlan ;
             try
             {
                 newPlan = new FlightPlan
@@ -112,6 +120,50 @@ namespace FlightControlWeb.Models
             idCreate(newPlan);
             createSegments(newPlan, input);
             return newPlan;
+        }
+        public async Task<FlightPlan> serverFlightPlan(string id)
+        {
+            FlightPlan flightPlanServer;
+
+            foreach (Server s in serverList.Values)
+            {
+                flightPlanServer = await serverGet(s, id);
+                if (flightPlanServer != null)
+                {
+                    return flightPlanServer;
+                }
+            }
+            return null;
+        }
+        public async Task<FlightPlan> serverGet(Server server, string id)
+        {
+            HttpWebResponse response;
+
+            try
+            {
+                string request = server.ServerURL + "/api/FlightPlan/" + id ;
+                string url = string.Format(request);
+                WebRequest objre = WebRequest.Create(url);
+                objre.Method = "GET";
+                // get response from the extrnal server
+
+                response = (HttpWebResponse)await objre.GetResponseAsync();
+            }
+            catch (Exception e)
+            {
+
+                return null;
+            }
+            Stream dataStream = response.GetResponseStream();
+            StreamReader reader = new StreamReader(dataStream);
+            string responseFromServer = reader.ReadToEnd();
+            reader.Close();
+            dataStream.Close();
+            response.Close();
+            // makeing new list of flight
+            FlightPlan flightList = null;
+            flightList = JsonConvert.DeserializeObject<FlightPlan>(responseFromServer);
+            return flightList;
         }
     }
 }

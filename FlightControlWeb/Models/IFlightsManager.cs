@@ -15,7 +15,7 @@ namespace FlightControlWeb.Models
 
         public  Task<List<Flight>> serverFlights(DateTime relativeTime);
 
-        public  Task<IEnumerable<Flight>> serverGet(Server server, DateTime relativeTime);
+        public  Task<List<Flight>> serverGet(Server server, DateTime relativeTime);
      
     }
 }

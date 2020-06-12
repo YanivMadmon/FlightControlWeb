@@ -1,30 +1,49 @@
 using FlightControlWeb.Controllers;
 using FlightControlWeb.Model;
 using FlightControlWeb.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Nancy.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace FlightControlTests
 {
     [TestClass]
-    public class FlightPlanControllerTests
+    public class ControllersTests
     {
+        private IMemoryCache cache;
+        private Generator gen;
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            cache = new Microsoft.Extensions.Caching.Memory.MemoryCache(new MemoryCacheOptions());
+            cache.Set("FlightPlans", new Dictionary<string, FlightPlan>());
+            cache.Set("Servers", new Dictionary<string, Server>());
+            Dictionary<string, Server> serverList = cache.Get("Servers") as Dictionary<string, Server>;
+            Server s = new Server
+            {
+                Id = "123",
+                ServerURL = "www.t.com"
+
+            };
+            serverList.Add("123", s);
+            gen = new Generator();
+
+        }
+
         [TestMethod]
         public void successFlightPlan()
         {
-            Generator gen = new Generator();
-            IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
-            cache.Set("FlightPlans", new Dictionary<string, FlightPlan>());
-            cache.Set("Servers", new Dictionary<string, Server>());
-
 
             FlightPlan fake = gen.fakeFlightPlan();
             JavaScriptSerializer js = new JavaScriptSerializer();
@@ -36,18 +55,17 @@ namespace FlightControlTests
             var flightPlanController = new FlightPlanController(cache , mockfp.Object);
             var response = flightPlanController.PostPlan(Json);
             var okResult = response as OkObjectResult;
+            var fplan = (FlightPlan)okResult.Value;
             Assert.IsNotNull(okResult);
 
             Assert.AreEqual(200, okResult.StatusCode);
+            Assert.AreEqual(fplan.passengers, fake.passengers);
+
         }
 
         [TestMethod]
         public void faildFlightPlan()
         {
-            Generator gen = new Generator();
-            IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
-            cache.Set("FlightPlans", new Dictionary<string, FlightPlan>());
-            cache.Set("Servers", new Dictionary<string, Server>());
 
             FlightPlan fake = null;
             string json = "worng new plan";
@@ -65,40 +83,39 @@ namespace FlightControlTests
         public async Task faildFlight()
         {
             DateTime time = DateTime.Now;
-            IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
-            cache.Set("FlightPlans", new Dictionary<string, FlightPlan>());
-            cache.Set("Servers", new Dictionary<string, Server>());
 
-            Task<List<Flight>> fakeFlightList = null;
+            List<Flight> fakeFlightList = null;
             Mock<IFlightsManager> mockfp = new Mock<IFlightsManager>();
-            mockfp.Setup(x => x.serverFlights(time)).Returns(fakeFlightList);
+            mockfp.Setup(x => x.serverFlights(It.IsAny<DateTime>())).ReturnsAsync(fakeFlightList);
 
             var flightsController = new FlightsController(cache, mockfp.Object);
             string input = "relative_to = " + time.ToString("yyyy- MM - ddTHH:mm: ssZ");
             var response = await flightsController.GetAllFlights(input);
-            var badRequest = response as Task<IEnumerable<Flight>>;
-            Assert.IsNull(badRequest);
+            Assert.IsNull(response);
         }
-        //[TestMethod]
-        //public async Task successFlight()
-        //{
-        //    DateTime time = DateTime.Now;
-        //    Generator gen = new Generator();
-        //    IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
-        //    cache.Set("FlightPlans", new Dictionary<string, FlightPlan>());
-        //    cache.Set("Servers", new Dictionary<string, Server>());
+        [TestMethod]
+        public async Task successFlight()
+        {
 
+            List<Flight> fakeFlightList = gen.fakeFlight();
+            Mock<IFlightsManager> mockfp = new Mock<IFlightsManager>();
+            DateTime time = fakeFlightList[0].date_time;
+            mockfp.Setup(x => x.serverFlights(It.IsAny<DateTime>())).ReturnsAsync(fakeFlightList);
+            FlightsController flightsController = new FlightsController(cache,mockfp.Object)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext()
+                }
+            };
+            // Add sync_all to query.
+            flightsController.HttpContext.Request.QueryString = new QueryString("?sync_all");
+            string input = time.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            List<Flight> response = await flightsController.GetAllFlights(input);
 
-        //    Task<List<Flight>> fakeFlightList = gen.fakeFlight();
-        //    Mock<IFlightsManager> mockfp = new Mock<IFlightsManager>();
-        //    mockfp.Setup(x => x.serverFlights(time)).Returns(fakeFlightList);
-
-        //    var flightsController = new FlightsController(cache, mockfp.Object);
-        //    string input = time.ToString("yyyy-MM-ddTHH:mm:ssZ");
-        //    var response = await flightsController.GetAllFlights(input);
-        //    var ob = response as Task<IEnumerable<Flight>>;
-        //    Assert.IsNotNull(ob);
-        //}
+            Assert.IsNotNull(response);
+            Assert.AreEqual(fakeFlightList[0].flight_id, response[0].flight_id);
+        }
 
 
     }

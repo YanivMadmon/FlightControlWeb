@@ -36,7 +36,6 @@ namespace FlightControlWeb
             services.AddScoped<IFlightPlansManager, FlightPlansManager>();
             services.AddScoped<IFlightsManager, FlightsManager>();
 
-
             services.AddControllers();
             services.AddMemoryCache();
             services.AddMvc();
@@ -53,8 +52,11 @@ namespace FlightControlWeb
 
             cache.Set("FlightPlans", new Dictionary<string, FlightPlan>());
             cache.Set("Servers", new Dictionary<string, Server>());
+           
 
             app.UseStaticFiles();
+            app.UseHttpsRedirection();
+
 
             app.UseRouting();
 

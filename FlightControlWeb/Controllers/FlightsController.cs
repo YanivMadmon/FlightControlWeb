@@ -30,7 +30,7 @@ namespace FlightControlWeb.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Flight>> GetAllFlights([FromQuery(Name = "relative_to")] string relative_to)
+        public async Task<List<Flight>> GetAllFlights([FromQuery(Name = "relative_to")] string relative_to)
         {
             DateTime relativeTime;
             if(!DateTime.TryParse(relative_to , out relativeTime))
@@ -39,7 +39,8 @@ namespace FlightControlWeb.Controllers
             }
             relativeTime = relativeTime.ToUniversalTime();
             List<Flight> flightsList = new List<Flight>();
-            if (Request.Query.ContainsKey("sync_all") && (serverList.Count != 0))
+            bool syncAll = Request.Query.Keys.Contains("sync_all");
+            if (syncAll && (serverList.Count != 0))
             {
                 List<Flight> flightsListServer;
                 flightsListServer = await manager.serverFlights(relativeTime);
