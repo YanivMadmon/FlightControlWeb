@@ -1,4 +1,5 @@
 ﻿let thisFlight = "";
+let currentFlights = []
 let idCol = -1;
 let detailsShow = -1;
 async function getFlights() {
@@ -13,7 +14,12 @@ async function getFlights() {
         // update table
         $('#flight_table tbody').empty();
         $('#flight_table tbody').append(thisFlight);
+        if (Object.keys(flightDic).length > 0) {
+            //delet all the flights that end to fly
+            updateIcons()
+        }
         thisFlight = "";
+        currentFlights = [];
     }
     catch (err) {
         console.log('problem in GetFlights' + err);
@@ -46,22 +52,17 @@ function addFlights(flight) {
     thisFlight +=" "+"onclick =\"clickRow(this,true)\"><td>" + flight.flight_id +
         "</td>" + "<td>" + flight.company_name +
         "</td>" + "<td>" + flight.is_external + "</td>" + "<td>" + butt + "</td></tr>";
-    //console.log(thisFlight);
 }
 
 
 
 function removeFlight(row) {
-    //console.log(row);
     let a = row.parentNode.parentNode;
     let idFlighet = a.cells[0].innerHTML;
-    //console.log(idFlighet + " = " + idCol);
     if (idCol === idFlighet) {
         idCol = -1;
     }
-    //console.log("new" + idCol);
     let url1 = "http://localhost:5000/api/Flights/" + idFlighet;
-    //console.log(url1);
     $.ajax({
         url: url1,
         type: 'DELETE',
@@ -81,6 +82,7 @@ function IterateAllFlights(data) {
         $(flight).each(function (index, value) {
             addFlights(value);
             drawFlight(value);
+            currentFlights.push(value.flight_id);
         })
     })
 }
@@ -177,4 +179,16 @@ function cleanFlightDetails() {
     dep.innerHTML = "";
     const arr = document.getElementById("arrival");
     arr.innerHTML = "";
+}
+
+function updateIcons() {
+    for (const [key, value] of Object.entries(flightDic)) {
+        if (currentFlights.includes(key)) {
+            continue;
+        }
+        else {
+            // value (=id) are not in server, so erase it from the map
+            removeFromMap(key);
+        }
+    }
 }

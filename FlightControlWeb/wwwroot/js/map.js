@@ -1,5 +1,4 @@
 ﻿let map;
-//let polylinePoints=[]
 let isClicked = false;
 let mapedClicked = false;
 let polyline = undefined;
@@ -56,9 +55,13 @@ function drawFlight(flight) {
 function removeFromMap(id) {
     //remove the airplane
     map.removeLayer(flightDic[id].icon);
+    //if the id pressed -delete the details and the path
+    if (flightDic[id].isPressed == true) {
+        cleanPath();
+        cleanFlightDetails();
+    }
     //remove from the dictionary
     delete flightDic[id];
-    cleanPath();
 }
 
 function airplanClick(id) {
