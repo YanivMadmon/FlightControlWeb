@@ -25,7 +25,6 @@ namespace FlightControlWeb.Controllers
 
         public serversController(IMemoryCache memoryCache)
         {
-            //init members
             this.cache = memoryCache;
             serverList = cache.Get("Servers") as Dictionary<string, Server>;
 
@@ -47,7 +46,6 @@ namespace FlightControlWeb.Controllers
             Server newServer;
             try
             {
-                // init new server
                 newServer = new Server
                 {
                     Id = obj["ServerId"],
@@ -57,13 +55,11 @@ namespace FlightControlWeb.Controllers
             catch (Exception e)
             {
                 e.ToString();
-                //bad input
                 return BadRequest("worng input"); ;
             }
 
             if (serverList.ContainsKey(newServer.Id)) {
-                //the id of the server in use
-                return BadRequest("server already exist");
+                return BadRequest("server exist");
             }
             serverList.Add(newServer.Id, newServer);    
             return Ok(newServer);
@@ -72,10 +68,9 @@ namespace FlightControlWeb.Controllers
         [HttpDelete("{id}")]
         public  ActionResult<Server> DeleteServer(string id)
         {
-            // if the server doesnt exist
             if (!serverList.ContainsKey(id))
             {
-                return BadRequest("server doesnt exist");
+                return NotFound();
             }
             serverList.Remove(id);
 

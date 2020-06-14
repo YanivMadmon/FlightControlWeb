@@ -19,35 +19,32 @@ namespace FlightControlWeb.Controllers
     {
         private IFlightPlansManager manager;
         private readonly IMemoryCache cache;
-        private Dictionary<string, FlightPlan> fpList;
+        private Dictionary<string, FlightPlan> fplist;
 
 
         public FlightPlanController(IMemoryCache memoryCache , IFlightPlansManager manager )
         {
-            //init members
             cache = memoryCache;
             this.manager = manager;
-            fpList = cache.Get("FlightPlans") as Dictionary<string, FlightPlan>;
+            fplist = cache.Get("FlightPlans") as Dictionary<string, FlightPlan>;
 
         }
 
         [HttpGet("{id}")]
-        public async Task<object> GetPlan(string id)
+        public async Task<ObjectResult> GetPlan(string id)
         {
-            //check if in cache
             FlightPlan fp;
-            if (!fpList.ContainsKey(id))
+            if (!fplist.ContainsKey(id))
             {
-                //check in servers
                 fp = await manager.serverFlightPlan(id);
                 if (fp == null)
                 {
-                    return NoContent();
+                    return BadRequest("NOT Found"); 
                 }
             }
             else
             {
-                fp = fpList[id];
+                fp = fplist[id];
             }
             fp.Id = id;
             return Ok(fp); 
@@ -57,23 +54,20 @@ namespace FlightControlWeb.Controllers
         public IActionResult PostPlan(object body)
         {
             string input = body.ToString();
-           // create flight plan from Jonson
+           
             FlightPlan newPlan = manager.createFP(input);
 
             if (newPlan == null)
             {
-                // bad input
                 return BadRequest("worng input");
             }
             else
             {
-                // check if flightplan exist
-                if (fpList.ContainsKey(newPlan.Id))
+                if (fplist.ContainsKey(newPlan.Id))
                 {
                     return BadRequest("Flight Plan exist");
                 }
-                // add to the cache
-                fpList.Add(newPlan.Id, newPlan);
+                fplist.Add(newPlan.Id, newPlan);
                 return Ok(newPlan);
             }
         }

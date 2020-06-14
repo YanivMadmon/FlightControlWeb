@@ -4,10 +4,10 @@ let mapedClicked = false;
 let polyline = undefined;
 flightDic = {}
 function drawMap() {
-	 let mymap = L.map('mapid').setView([31.80, 35.20], 13);
-       L.tileLayer('https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=INeUSkJ98XKYWli4tyyI', {
+    let mymap = L.map('mapid').setView([31.80, 35.20], 13);
+    L.tileLayer('https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=INeUSkJ98XKYWli4tyyI', {
         attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
-        }).addTo(mymap);
+    }).addTo(mymap);
     map = mymap;
     map.on('click', onMapClick);
 }
@@ -68,7 +68,7 @@ function airplanClick(id) {
     cleanPath();
     //new Flight
     mapedClicked = false;
-    let f=flightDic[id]
+    let f = flightDic[id]
     let airplane = L.icon({
         iconUrl: 'img/Black-airplane-flight.svg',
         iconSize: [40, 40], // size of the icon
@@ -85,7 +85,7 @@ function airplanClick(id) {
     f.icon.setIcon(RepAirplane);
     let keys = Object.keys(flightDic);
     for (let i = 0; i < keys.length; i++) {
-        if ((flightDic[keys[i]].isPressed = true) && (flightDic[keys[i]]!=f)) {
+        if ((flightDic[keys[i]].isPressed = true) && (flightDic[keys[i]] != f)) {
             flightDic[keys[i]].isPressed = false;
             flightDic[keys[i]].icon.setIcon(airplane);
         }
@@ -94,12 +94,12 @@ function airplanClick(id) {
 
 }
 
-function drawPath(segments,lat,lon) {
+function drawPath(segments, lat, lon) {
     //console.log(segments);
     polylinePoints = [];
     polylinePoints.push([lat, lon]);
     let i = 0
-    for (i = 0; i < segments.length;i++) {
+    for (i = 0; i < segments.length; i++) {
         let x = segments[i].latitude;
         let y = segments[i].longitude;
         polylinePoints.push([x, y]);

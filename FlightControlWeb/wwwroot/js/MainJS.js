@@ -11,19 +11,20 @@ async function getFlights() {
         let flightPlans = await response.json();
         // iterate
         IterateAllFlights(flightPlans);
-        // update table
-        $('#flight_table tbody').empty();
-        $('#flight_table tbody').append(thisFlight);
-        if (Object.keys(flightDic).length > 0) {
-            //delet all the flights that end to fly
-            updateIcons()
-        }
-        thisFlight = "";
-        currentFlights = [];
     }
     catch (err) {
         console.log('problem in GetFlights' + err);
     }
+
+    // update table
+    $('#flight_table tbody').empty();
+    $('#flight_table tbody').append(thisFlight);
+    if (Object.keys(flightDic).length > 0) {
+        //delet all the flights that end to fly
+        updateIcons()
+    }
+    thisFlight = "";
+    currentFlights = [];
 }
 
 function flightsTable() {
@@ -49,7 +50,7 @@ function addFlights(flight) {
     else {
         thisFlight += "style=\"background-color: lightgray;\" ";
     }
-    thisFlight +=" "+"onclick =\"clickRow(this,true)\"><td>" + flight.flight_id +
+    thisFlight += " " + "onclick =\"clickRow(this,true)\"><td>" + flight.flight_id +
         "</td>" + "<td>" + flight.company_name +
         "</td>" + "<td>" + flight.is_external + "</td>" + "<td>" + butt + "</td></tr>";
 }
@@ -127,7 +128,7 @@ function flightDetails(id) {
         //update initial location
         const initLocation = data["initial_location"]
         const initLat = document.getElementById("initialLat");
-        initLat.innerHTML ="lat: " + initLocation["latitude"];
+        initLat.innerHTML = "lat: " + initLocation["latitude"];
         const initLon = document.getElementById("initialLon");
         initLon.innerHTML = "lon: " + initLocation["longitude"];
 

@@ -1,0 +1,21 @@
+#mapid{
+    height:420px;
+    width:740px;
+}
+.button {
+    border: none;
+    color: white;
+    padding: 2px 4px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 11px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+.button1 {
+    background-color: silver;
+    color: darkslategray;
+    border: 2px solid #e61109;
+}

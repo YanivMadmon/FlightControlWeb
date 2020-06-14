@@ -23,7 +23,6 @@ namespace FlightControlWeb.Controllers
 
         public FlightsController(IMemoryCache memoryCache , IFlightsManager manager)
         {
-            // init members
             this.cache = memoryCache;
             this.manager = manager;
             fpList = (Dictionary<string, FlightPlan>)cache.Get("FlightPlans");
@@ -34,19 +33,15 @@ namespace FlightControlWeb.Controllers
         public async Task<object> GetAllFlights([FromQuery(Name = "relative_to")] string relative_to)
         {
             DateTime relativeTime;
-            //check if string can be datetime
             if(!DateTime.TryParse(relative_to , out relativeTime))
             {
-                return BadRequest("worng input");
+                return null; 
             }
             relativeTime = relativeTime.ToUniversalTime();
             List<Flight> flightsList = new List<Flight>();
-
-            // if string contain "sync_all"
             bool syncAll = Request.Query.Keys.Contains("sync_all");
             if (syncAll && (serverList.Count != 0))
             {
-                // flights in extrnal servers
                 List<Flight> flightsListServer;
                 flightsListServer = await manager.serverFlights(relativeTime);
                 if (flightsListServer != null)
@@ -55,19 +50,20 @@ namespace FlightControlWeb.Controllers
 
                 }
             }
-            // flights inside our server (cache)
             foreach (FlightPlan f in fpList.Values)
             {
                 manager.createFlights(f, flightsList, relativeTime);
             }
-
-            return Ok(flightsList);
+            if (flightsList.Count == 0)
+            {
+                return NotFound();
+            }
+            return flightsList;
 
         }
         [HttpDelete("{id}")]
         public ActionResult<Flight> DeleteServer(string id)
         {
-            // check if flight in the the cache
             if (!fpList.ContainsKey(id))
             {
                 return NotFound();

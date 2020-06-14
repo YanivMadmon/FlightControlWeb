@@ -10,7 +10,22 @@ namespace FlightControlWeb.Models
         public double latitude { get; set; }
 
         public double longitude { get; set; }
-        public DateTime date_time { get; set; }     
+        public DateTime date_time { get; set; }
+        //public string data_time
+        //{
+        //    get
+        //    {
+        //        return date.ToString("yyyy-MM-ddTHH:mm:ssZ");
+        //    }
+        //    set
+        //    {
+        //        if (value != null)
+        //        {
+        //            date = DateTime.Parse(value);
+        //        }
+        //    }
+        //}
+     
 
 
     }

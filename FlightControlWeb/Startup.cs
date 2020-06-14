@@ -50,7 +50,7 @@ namespace FlightControlWeb
 
             cache.Set("FlightPlans", new Dictionary<string, FlightPlan>());
             cache.Set("Servers", new Dictionary<string, Server>());
-           
+
 
             app.UseStaticFiles();
 
