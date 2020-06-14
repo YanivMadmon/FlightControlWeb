@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -58,10 +59,10 @@ namespace FlightControlWeb.Models
                 if (initTime.AddSeconds(seg.timespan_seconds) >= relativeTime)
                 {
                     // calculate the place
-                    disTime = (relativeTime-initTime).TotalSeconds;
+                    disTime = (relativeTime - initTime).TotalSeconds;
                     latForSec = Math.Abs(seg.latitude - latInit) / seg.timespan_seconds;
                     lonForSec = Math.Abs(seg.longitude - lonInit) / seg.timespan_seconds;
-                    if (latInit >=seg.latitude)
+                    if (latInit >= seg.latitude)
                     {
                         latDate = latInit - (disTime * latForSec);
                     }
@@ -93,9 +94,9 @@ namespace FlightControlWeb.Models
 
             flightsList.Add(newFlight);
         }
-        public async Task<List<Flight>> serverFlights( DateTime relativeTime)
+        public async Task<List<Flight>> serverFlights(DateTime relativeTime)
         {
-            List<Flight> allFlights = new List<Flight>() ;
+            List<Flight> allFlights = new List<Flight>();
             List<Flight> flightsListServer;
 
             foreach (Server s in serverList.Values)
@@ -111,6 +112,7 @@ namespace FlightControlWeb.Models
         public async Task<List<Flight>> serverGet(Server server, DateTime relativeTime)
         {
             HttpWebResponse response;
+            List<Flight> flightList = null;
 
             try
             {
@@ -121,29 +123,42 @@ namespace FlightControlWeb.Models
                 // get response from the extrnal server
 
                 response = (HttpWebResponse)await objre.GetResponseAsync();
+                Stream dataStream = response.GetResponseStream();
+                StreamReader reader = new StreamReader(dataStream);
+                string responseFromServer = reader.ReadToEnd();
+                reader.Close();
+                dataStream.Close();
+                response.Close();
+                // makeing new list of flight
+                if (true)
+                {
+                    flightList = JsonConvert.DeserializeObject<List<Flight>>(responseFromServer);
+                    foreach (Flight f in flightList)
+                    {
+                        f.is_external = true;
+                    }
+                }
             }
             catch (Exception e)
             {
+                e.ToString();
 
-                return null;
             }
-            Stream dataStream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(dataStream);
-            string responseFromServer = reader.ReadToEnd();
-            reader.Close();
-            dataStream.Close();
-            response.Close();
-            // makeing new list of flight
-            List<Flight> flightList = null;
-            if (responseFromServer.Contains("flight_id")){
-                flightList = JsonConvert.DeserializeObject<List<Flight>>(responseFromServer);
-            }
-            foreach (Flight f in flightList)
-            {
-                f.is_external = true;
-            }
+
             return flightList;
         }
-
+        public bool checkInput(string responseFromServer)
+        {
+            if (
+                responseFromServer.Contains("company_name") &&
+                responseFromServer.Contains("passengers") &&
+                responseFromServer.Contains("date_time") &&
+                responseFromServer.Contains("initial_location") &&
+                responseFromServer.Contains("latitude") &&
+                responseFromServer.Contains("longitude")
+                )
+                return true;
+            else { return false; }
+        }
     }
 }

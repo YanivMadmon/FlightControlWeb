@@ -111,10 +111,11 @@ namespace FlightControlTests
             // Add sync_all to query.
             flightsController.HttpContext.Request.QueryString = new QueryString("?sync_all");
             string input = time.ToString("yyyy-MM-ddTHH:mm:ssZ");
-            List<Flight> response = await flightsController.GetAllFlights(input);
+            var response = await flightsController.GetAllFlights(input);
+            var ob = (List<Flight>)response;
 
-            Assert.IsNotNull(response);
-            Assert.AreEqual(fakeFlightList[0].flight_id, response[0].flight_id);
+            Assert.IsNotNull(ob);
+            Assert.AreEqual(fakeFlightList[0].flight_id, ob[0].flight_id);
         }
 
 

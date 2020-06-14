@@ -30,7 +30,7 @@ namespace FlightControlWeb.Controllers
         }
 
         [HttpGet]
-        public async Task<List<Flight>> GetAllFlights([FromQuery(Name = "relative_to")] string relative_to)
+        public async Task<object> GetAllFlights([FromQuery(Name = "relative_to")] string relative_to)
         {
             DateTime relativeTime;
             if(!DateTime.TryParse(relative_to , out relativeTime))
@@ -53,6 +53,10 @@ namespace FlightControlWeb.Controllers
             foreach (FlightPlan f in fpList.Values)
             {
                 manager.createFlights(f, flightsList, relativeTime);
+            }
+            if (flightsList.Count == 0)
+            {
+                return NotFound();
             }
             return flightsList;
 

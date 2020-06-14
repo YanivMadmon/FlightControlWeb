@@ -39,13 +39,14 @@ namespace FlightControlWeb.Controllers
                 fp = await manager.serverFlightPlan(id);
                 if (fp == null)
                 {
-                    return null;
+                    return BadRequest("NOT Found"); 
                 }
             }
             else
             {
                 fp = fplist[id];
             }
+            fp.Id = id;
             return Ok(fp); 
         }
 
@@ -56,13 +57,19 @@ namespace FlightControlWeb.Controllers
            
             FlightPlan newPlan = manager.createFP(input);
 
-            if (newPlan == null||fplist.ContainsKey(newPlan.Id))
+            if (newPlan == null)
             {
                 return BadRequest("worng input");
             }
-            fplist.Add(newPlan.Id,newPlan);
-
-            return Ok(newPlan);
+            else
+            {
+                if (fplist.ContainsKey(newPlan.Id))
+                {
+                    return BadRequest("Flight Plan exist");
+                }
+                fplist.Add(newPlan.Id, newPlan);
+                return Ok(newPlan);
+            }
         }
 
     }

@@ -22,22 +22,19 @@ namespace FlightControlWeb.Models
 
         public void idCreate(FlightPlan fp)
         {
-            //string time = fp.initial_location.data_time;
-            string time1 = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff");
+            Random rand = new Random();
+            string time = DateTime.Now.ToString("yyyyMMddHHmmss");
+            string seg = fp.segments.Count.ToString();
             string company = fp.company_name;
             string newId = "";
             int i;
-            for (i = 0; i < 6; i++)
+            newId += company[0];
+            for (i = 0; i < 3; i++)
             {
-                if ((time1[i + 5] != '-') && (time1[i + 5] != ':')) {
-                    newId += time1[i + 5];
-                }
-                else
-                {
-                    newId += time1[i + 6];
-                }
-                newId += company[i % company.Length];
+                newId += time[rand.Next(1,50) % time.Length];
             }
+            newId += company[company.Length-1];
+            newId += seg;
             fp.Id = newId;
         }
 
@@ -134,10 +131,12 @@ namespace FlightControlWeb.Models
                 }
             }
             return null;
+
         }
         public async Task<FlightPlan> serverGet(Server server, string id)
         {
             HttpWebResponse response;
+            FlightPlan flightList = null;
 
             try
             {
@@ -148,22 +147,37 @@ namespace FlightControlWeb.Models
                 // get response from the extrnal server
 
                 response = (HttpWebResponse)await objre.GetResponseAsync();
+                Stream dataStream = response.GetResponseStream();
+                StreamReader reader = new StreamReader(dataStream);
+                string responseFromServer = reader.ReadToEnd();
+                reader.Close();
+                dataStream.Close();
+                response.Close();
+                // makeing new list of flight
+                if (checkInput(responseFromServer))
+                {
+                    flightList = JsonConvert.DeserializeObject<FlightPlan>(responseFromServer);
+                }
+
             }
             catch (Exception e)
             {
 
-                return null;
+                e.ToString();
             }
-            Stream dataStream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(dataStream);
-            string responseFromServer = reader.ReadToEnd();
-            reader.Close();
-            dataStream.Close();
-            response.Close();
-            // makeing new list of flight
-            FlightPlan flightList = null;
-            flightList = JsonConvert.DeserializeObject<FlightPlan>(responseFromServer);
             return flightList;
         }
+        public bool checkInput(string responseFromServer) {
+            if (
+                responseFromServer.Contains("company_name") &&
+                responseFromServer.Contains("passengers") &&
+                responseFromServer.Contains("date_time") &&
+                responseFromServer.Contains("initial_location") &&
+                responseFromServer.Contains("latitude") &&
+                responseFromServer.Contains("longitude"))
+                return true;
+            else { return false; }
+        }
+
     }
 }

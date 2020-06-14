@@ -54,6 +54,7 @@ namespace FlightControlWeb.Controllers
             }
             catch (Exception e)
             {
+                e.ToString();
                 return BadRequest("worng input"); ;
             }
 
