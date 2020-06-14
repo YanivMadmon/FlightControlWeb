@@ -31,14 +31,14 @@ namespace FlightControlWeb.Models
             newId += company[0];
             for (i = 0; i < 3; i++)
             {
-                newId += time[rand.Next(1,50) % time.Length];
+                newId += time[rand.Next(1, 50) % time.Length];
             }
-            newId += company[company.Length-1];
+            newId += company[company.Length - 1];
             newId += seg;
             fp.Id = newId;
         }
 
-        public void createSegments(FlightPlan fp , string segments_input)
+        public void createSegments(FlightPlan fp, string segments_input)
         {
             int index, i1, i2, i3, first, second;
             int index2, index3;
@@ -93,7 +93,11 @@ namespace FlightControlWeb.Models
         public FlightPlan createFP(string input)
         {
             dynamic obj = JsonConvert.DeserializeObject(input);
-            FlightPlan newPlan ;
+            if (!checkDate(input))
+            {
+                return null;
+            }
+            FlightPlan newPlan;
             try
             {
                 newPlan = new FlightPlan
@@ -140,7 +144,7 @@ namespace FlightControlWeb.Models
 
             try
             {
-                string request = server.ServerURL + "/api/FlightPlan/" + id ;
+                string request = server.ServerURL + "/api/FlightPlan/" + id;
                 string url = string.Format(request);
                 WebRequest objre = WebRequest.Create(url);
                 objre.Method = "GET";
@@ -167,7 +171,8 @@ namespace FlightControlWeb.Models
             }
             return flightList;
         }
-        public bool checkInput(string responseFromServer) {
+        public bool checkInput(string responseFromServer)
+        {
             if (
                 responseFromServer.Contains("company_name") &&
                 responseFromServer.Contains("passengers") &&
@@ -178,6 +183,21 @@ namespace FlightControlWeb.Models
                 return true;
             else { return false; }
         }
-
+        public bool checkDate(string input)
+        {
+            int i = input.IndexOf("date_time");
+            int i1 = input.IndexOf("}", i);
+            string date = input.Substring(i+13, 20);
+            //string date = 
+            if (date.Length != 20)
+            {
+                return false;
+            }
+            if (date[4] != '-' || date[7] != '-' || date[10] != 'T' || date[13] != ':' || date[16] != ':' || date[19] != 'Z')
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }

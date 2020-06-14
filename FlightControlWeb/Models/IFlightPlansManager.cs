@@ -16,6 +16,7 @@ namespace FlightControlWeb.Models
         public FlightPlan createFP(string input);
         public  Task<FlightPlan> serverFlightPlan(string id);
         public  Task<FlightPlan> serverGet(Server server, string id);
+        public bool checkDate(string date);
 
     }
 }

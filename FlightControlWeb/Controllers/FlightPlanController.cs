@@ -24,6 +24,7 @@ namespace FlightControlWeb.Controllers
 
         public FlightPlanController(IMemoryCache memoryCache , IFlightPlansManager manager )
         {
+            //init members
             cache = memoryCache;
             this.manager = manager;
             fpList = cache.Get("FlightPlans") as Dictionary<string, FlightPlan>;
@@ -33,9 +34,11 @@ namespace FlightControlWeb.Controllers
         [HttpGet("{id}")]
         public async Task<object> GetPlan(string id)
         {
+            //check if in cache
             FlightPlan fp;
             if (!fpList.ContainsKey(id))
             {
+                //check in servers
                 fp = await manager.serverFlightPlan(id);
                 if (fp == null)
                 {
@@ -54,19 +57,22 @@ namespace FlightControlWeb.Controllers
         public IActionResult PostPlan(object body)
         {
             string input = body.ToString();
-           
+           // create flight plan from Jonson
             FlightPlan newPlan = manager.createFP(input);
 
             if (newPlan == null)
             {
+                // bad input
                 return BadRequest("worng input");
             }
             else
             {
+                // check if flightplan exist
                 if (fpList.ContainsKey(newPlan.Id))
                 {
                     return BadRequest("Flight Plan exist");
                 }
+                // add to the cache
                 fpList.Add(newPlan.Id, newPlan);
                 return Ok(newPlan);
             }
