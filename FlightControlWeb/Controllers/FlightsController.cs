@@ -35,7 +35,7 @@ namespace FlightControlWeb.Controllers
             DateTime relativeTime;
             if(!DateTime.TryParse(relative_to , out relativeTime))
             {
-                return null; 
+                return BadRequest("worng input");
             }
             relativeTime = relativeTime.ToUniversalTime();
             List<Flight> flightsList = new List<Flight>();
@@ -54,11 +54,8 @@ namespace FlightControlWeb.Controllers
             {
                 manager.createFlights(f, flightsList, relativeTime);
             }
-            if (flightsList.Count == 0)
-            {
-                return NotFound();
-            }
-            return flightsList;
+
+            return Ok(flightsList);
 
         }
         [HttpDelete("{id}")]

@@ -129,8 +129,8 @@ namespace FlightControlWeb.Models
                 reader.Close();
                 dataStream.Close();
                 response.Close();
-                // makeing new list of flight
-                if (true)
+                // making new list of flight
+                if (checkInput(responseFromServer))
                 {
                     flightList = JsonConvert.DeserializeObject<List<Flight>>(responseFromServer);
                     foreach (Flight f in flightList)
@@ -153,7 +153,7 @@ namespace FlightControlWeb.Models
                 responseFromServer.Contains("company_name") &&
                 responseFromServer.Contains("passengers") &&
                 responseFromServer.Contains("date_time") &&
-                responseFromServer.Contains("initial_location") &&
+                responseFromServer.Contains("flight_id") &&
                 responseFromServer.Contains("latitude") &&
                 responseFromServer.Contains("longitude")
                 )

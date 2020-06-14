@@ -19,32 +19,32 @@ namespace FlightControlWeb.Controllers
     {
         private IFlightPlansManager manager;
         private readonly IMemoryCache cache;
-        private Dictionary<string, FlightPlan> fplist;
+        private Dictionary<string, FlightPlan> fpList;
 
 
         public FlightPlanController(IMemoryCache memoryCache , IFlightPlansManager manager )
         {
             cache = memoryCache;
             this.manager = manager;
-            fplist = cache.Get("FlightPlans") as Dictionary<string, FlightPlan>;
+            fpList = cache.Get("FlightPlans") as Dictionary<string, FlightPlan>;
 
         }
 
         [HttpGet("{id}")]
-        public async Task<ObjectResult> GetPlan(string id)
+        public async Task<object> GetPlan(string id)
         {
             FlightPlan fp;
-            if (!fplist.ContainsKey(id))
+            if (!fpList.ContainsKey(id))
             {
                 fp = await manager.serverFlightPlan(id);
                 if (fp == null)
                 {
-                    return BadRequest("NOT Found"); 
+                    return NoContent();
                 }
             }
             else
             {
-                fp = fplist[id];
+                fp = fpList[id];
             }
             fp.Id = id;
             return Ok(fp); 
@@ -63,11 +63,11 @@ namespace FlightControlWeb.Controllers
             }
             else
             {
-                if (fplist.ContainsKey(newPlan.Id))
+                if (fpList.ContainsKey(newPlan.Id))
                 {
                     return BadRequest("Flight Plan exist");
                 }
-                fplist.Add(newPlan.Id, newPlan);
+                fpList.Add(newPlan.Id, newPlan);
                 return Ok(newPlan);
             }
         }

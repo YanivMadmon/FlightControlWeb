@@ -59,7 +59,7 @@ namespace FlightControlWeb.Controllers
             }
 
             if (serverList.ContainsKey(newServer.Id)) {
-                return BadRequest("server exist");
+                return BadRequest("server already exist");
             }
             serverList.Add(newServer.Id, newServer);    
             return Ok(newServer);
@@ -70,7 +70,7 @@ namespace FlightControlWeb.Controllers
         {
             if (!serverList.ContainsKey(id))
             {
-                return NotFound();
+                return BadRequest("server doesnt exist");
             }
             serverList.Remove(id);
 

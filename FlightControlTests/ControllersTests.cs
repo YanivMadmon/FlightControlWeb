@@ -91,7 +91,9 @@ namespace FlightControlTests
             var flightsController = new FlightsController(cache, mockfp.Object);
             string input = "relative_to = " + time.ToString("yyyy- MM - ddTHH:mm: ssZ");
             var response = await flightsController.GetAllFlights(input);
-            Assert.IsNull(response);
+            var badRequest = response as BadRequestObjectResult;
+
+            Assert.AreEqual("worng input", badRequest.Value);
         }
         [TestMethod]
         public async Task successFlight()
